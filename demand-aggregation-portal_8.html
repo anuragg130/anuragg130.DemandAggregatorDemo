@@ -1,0 +1,591 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Skilled Manpower Demand Aggregation — FMCG Value Chain</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700;800&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<style>
+  :root{--ey-yellow:#FFE600;--charcoal:#2E2E38;--charcoal-2:#3a3a46;--ink:#1b1b21;--muted:#71717f;
+    --line:#e4e4ea;--bg:#f2f2f5;--white:#fff;--teal:#2DA89C;--red:#d64545;
+    --shadow:0 1px 2px rgba(46,46,56,.06),0 8px 24px rgba(46,46,56,.06)}
+  *{box-sizing:border-box} html,body{margin:0;padding:0}
+  body{font-family:'Manrope',sans-serif;background:var(--bg);color:var(--ink);-webkit-font-smoothing:antialiased;line-height:1.5}
+  h1,h2,h3,h4{font-family:'Archivo',sans-serif;margin:0;letter-spacing:-.01em}
+  header{background:var(--charcoal);color:#fff;position:relative;overflow:hidden}
+  header::after{content:"";position:absolute;right:-60px;top:0;bottom:0;width:220px;
+    background:linear-gradient(105deg,transparent 0 48%,var(--ey-yellow) 48% 56%,transparent 56%);opacity:.9}
+  .head-inner{max-width:1280px;margin:0 auto;padding:22px 32px 16px;position:relative;z-index:2}
+  .brandrow{display:flex;align-items:center;gap:16px}
+  .ey-mark{font-family:'Archivo';font-weight:800;font-size:26px;color:#fff;display:inline-flex;align-items:center;gap:8px}
+  .ey-mark .beam{width:26px;height:26px;display:inline-block;
+    background:linear-gradient(135deg,var(--ey-yellow) 0 60%,#caa500 60% 100%);clip-path:polygon(0 100%,100% 0,100% 38%,38% 100%)}
+  .head-titles{flex:1;min-width:0}.head-titles h1{font-size:22px;font-weight:700;color:#fff}
+  .head-titles p{margin:2px 0 0;color:#c7c7d2;font-size:13.5px}
+  .tag{background:var(--ey-yellow);color:var(--charcoal);font-family:'Archivo';font-weight:700;font-size:11px;letter-spacing:.06em;text-transform:uppercase;padding:6px 11px;border-radius:3px}
+  .tabbar{max-width:1280px;margin:0 auto;padding:0 32px;display:flex;gap:4px}
+  .tab{background:none;border:none;cursor:pointer;font-family:'Archivo';font-weight:600;font-size:14px;color:var(--muted);padding:14px 18px;border-bottom:3px solid transparent;margin-bottom:-1px}
+  .tab.active{color:var(--charcoal);border-bottom-color:var(--ey-yellow)}
+  .tab .badge{background:var(--charcoal);color:#fff;font-size:11px;border-radius:20px;padding:1px 8px;margin-left:6px;font-family:'Manrope';font-weight:700}
+  .wrap{max-width:1280px;margin:0 auto;padding:26px 32px 80px}
+  .view{display:none}.view.show{display:block;animation:fade .3s ease}
+  @keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+  .card{background:var(--white);border:1px solid var(--line);border-radius:8px;box-shadow:var(--shadow)}
+  .card-h{padding:16px 22px;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+  .card-h h2{font-size:16px;font-weight:700}.card-h .sub{color:var(--muted);font-size:12.5px;font-weight:500}
+  .step-no{font-family:'Archivo';font-weight:800;font-size:12px;background:var(--charcoal);color:#fff;width:24px;height:24px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;flex:0 0 auto}
+  .card-b{padding:22px}.mb{margin-bottom:20px}
+  .grid{display:grid;gap:16px}.g3{grid-template-columns:repeat(3,1fr)}
+  label{display:block;font-size:12px;font-weight:700;color:var(--charcoal);margin-bottom:6px}label .req{color:var(--red)}
+  input,select{width:100%;font-family:'Manrope';font-size:14px;padding:10px 12px;border:1px solid var(--line);border-radius:6px;background:#fafafb;color:var(--ink);transition:.15s}
+  input:focus,select:focus{outline:none;border-color:var(--charcoal);background:#fff;box-shadow:0 0 0 3px rgba(255,230,0,.35)}
+  input::placeholder{color:#aaa}
+  .vc-pick{display:grid;grid-template-columns:repeat(auto-fill,minmax(215px,1fr));gap:12px}
+  .vc-btn{cursor:pointer;border:1.5px solid var(--line);background:#fafafb;border-radius:8px;padding:13px 15px;text-align:left;transition:.15s;font-family:'Manrope'}
+  .vc-btn:hover{border-color:#bdbdc8}.vc-btn.sel{border-color:var(--charcoal);background:#fff;box-shadow:0 0 0 3px rgba(255,230,0,.4)}
+  .vc-btn .num{font-family:'Archivo';font-weight:800;font-size:12px;color:#fff;background:var(--charcoal);width:22px;height:22px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;margin-bottom:7px}
+  .vc-btn.sel .num{background:var(--ey-yellow);color:var(--charcoal)}
+  .vc-btn .nm{font-family:'Archivo';font-weight:700;font-size:14px;display:block;line-height:1.25}
+  .vc-btn .ct{font-size:11px;color:var(--muted);margin-top:3px;display:block}
+  .lines{margin-top:4px;overflow-x:auto}.lines table{width:100%;border-collapse:collapse;min-width:820px}
+  .lines th{font-family:'Archivo';font-size:11px;text-transform:uppercase;letter-spacing:.03em;color:var(--muted);text-align:left;padding:8px 9px;border-bottom:2px solid var(--line);white-space:nowrap}
+  .lines td{padding:7px 9px;border-bottom:1px solid var(--line);vertical-align:middle}
+  .lines input,.lines select{padding:8px 9px;font-size:13px}.lines input[type=number]{max-width:90px}
+  .ssother{display:flex;gap:6px;align-items:center}
+  .revert,.revert-d{flex:0 0 auto;border:1px solid var(--line);background:#fff;border-radius:5px;width:30px;height:34px;cursor:pointer;font-size:14px;color:var(--muted)}
+  .revert:hover,.revert-d:hover{border-color:var(--charcoal);color:var(--charcoal)}
+  .rm{border:none;background:none;color:var(--red);font-size:20px;line-height:1;cursor:pointer;padding:2px 8px;border-radius:5px}.rm:hover{background:#fde8e8}
+  .empty-d{padding:30px;text-align:center;color:var(--muted);font-size:13.5px;border:1.5px dashed var(--line);border-radius:8px}
+  .actions{display:flex;gap:12px;align-items:center;margin-top:18px;flex-wrap:wrap}
+  .btn{font-family:'Archivo';font-weight:700;font-size:14px;border:none;border-radius:6px;cursor:pointer;padding:11px 20px;transition:.15s;display:inline-flex;align-items:center;gap:8px}
+  .btn-primary{background:var(--ey-yellow);color:var(--charcoal)}.btn-primary:hover{background:#ffec40;box-shadow:0 6px 16px rgba(255,230,0,.4)}
+  .btn-ghost{background:#fff;color:var(--charcoal);border:1px solid var(--line)}.btn-ghost:hover{border-color:var(--charcoal)}
+  .btn-dark{background:var(--charcoal);color:#fff}.btn-dark:hover{background:#1f1f27}
+  .btn-sm{padding:8px 14px;font-size:12.5px}.btn:disabled{opacity:.5;cursor:not-allowed}
+  .hint{color:var(--muted);font-size:12.5px}
+  .notice{background:#fffbe6;border:1px solid #f3e08a;border-radius:6px;padding:10px 14px;font-size:12.5px;color:#6b5d00;margin-bottom:18px}
+  .toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--charcoal);color:#fff;padding:14px 20px;border-radius:8px;font-weight:600;font-size:14px;box-shadow:0 12px 40px rgba(0,0,0,.3);opacity:0;pointer-events:none;transition:.3s;z-index:50;border-left:4px solid var(--ey-yellow)}
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+  .toolbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;flex-wrap:wrap;gap:12px}.toolbar h2{font-size:18px}
+  .kpis{display:grid;grid-template-columns:repeat(5,1fr);gap:16px;margin-bottom:16px}
+  .kpi{background:#fff;border:1px solid var(--line);border-radius:8px;padding:16px 18px;box-shadow:var(--shadow);position:relative;overflow:hidden}
+  .kpi::before{content:"";position:absolute;left:0;top:0;bottom:0;width:4px;background:var(--ey-yellow)}
+  .kpi .lab{font-size:11px;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);font-weight:700}
+  .kpi .val{font-family:'Archivo';font-weight:800;font-size:28px;line-height:1.1;margin-top:5px}
+  .kpi .sub{font-size:11.5px;color:var(--muted);margin-top:2px}
+  .chips{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:20px}
+  .chip{background:#fff;border:1px solid var(--line);border-radius:30px;padding:6px 14px;font-size:12.5px;font-weight:600;color:var(--charcoal)}.chip b{font-family:'Archivo';margin-right:3px}
+  .metricbar{display:flex;align-items:center;gap:14px;margin-bottom:18px;flex-wrap:wrap}
+  .metric-toggle{display:inline-flex;border:1px solid var(--line);border-radius:8px;overflow:hidden;background:#fff}
+  .metric-toggle button{border:none;background:#fff;padding:9px 16px;font-family:'Archivo';font-weight:600;font-size:13px;cursor:pointer;color:var(--muted)}
+  .metric-toggle button.on{background:var(--charcoal);color:#fff}
+  .filtbar{display:flex;gap:14px;flex-wrap:wrap;align-items:end}
+  .fitem{display:flex;flex-direction:column;min-width:175px;flex:1}.fitem label{margin-bottom:5px}.fitem select{background:#fff}
+  .gbar{display:grid;grid-template-columns:165px 1fr;align-items:center;gap:12px;padding:8px 0;border-bottom:1px solid #f4f4f6}
+  .gbar .blab{font-size:13px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .gbar .blab small{display:block;color:var(--muted);font-weight:500;font-size:11px}
+  .gset{display:flex;flex-direction:column;gap:3px}
+  .grow{display:grid;grid-template-columns:46px 1fr 58px;align-items:center;gap:8px}
+  .grow .gk{font-size:9.5px;color:var(--muted);font-weight:700;text-transform:uppercase}
+  .gtrack{background:#f0f0f3;border-radius:4px;height:13px;overflow:hidden}.gfill{height:100%;border-radius:4px;transition:width .5s ease}
+  .gv{text-align:right;font-family:'Archivo';font-weight:700;font-size:12px}
+  .glegend{display:flex;gap:14px;font-size:11px;color:var(--muted);margin-bottom:8px}
+  .glegend i{width:10px;height:10px;border-radius:2px;display:inline-block;margin-right:4px;vertical-align:-1px}
+  .dash-grid{display:grid;grid-template-columns:1.5fr 1fr;gap:20px;align-items:start}
+  .mapgrid{display:grid;grid-template-columns:1.1fr .9fr;gap:24px;align-items:start}
+  @media(max-width:980px){.dash-grid,.mapgrid{grid-template-columns:1fr}.kpis{grid-template-columns:repeat(2,1fr)}.g3{grid-template-columns:1fr}}
+  .bar-row{display:grid;grid-template-columns:165px 1fr 64px;align-items:center;gap:10px;padding:6px 0}
+  .bar-row .blab{font-size:13px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .bar-row .blab small{display:block;color:var(--muted);font-weight:500;font-size:11px}
+  .bartrack{background:#f0f0f3;border-radius:5px;height:22px;overflow:hidden}
+  .barfill{height:100%;border-radius:5px;transition:width .5s ease}
+  .bval{text-align:right;font-family:'Archivo';font-weight:700;font-size:14px}
+  .seg{display:flex;height:30px;border-radius:6px;overflow:hidden;border:1px solid var(--line);margin:6px 0 12px}
+  .seg span{display:flex;align-items:center;justify-content:center;color:#fff;font-size:11px;font-weight:700;font-family:'Archivo';min-width:0;overflow:hidden;white-space:nowrap}
+  .legend{display:flex;flex-wrap:wrap;gap:12px;font-size:12px;color:var(--muted)}
+  .legend i{width:11px;height:11px;border-radius:2px;display:inline-block;margin-right:5px;vertical-align:-1px}
+  /* map */
+  #mapWrap{position:relative}
+  .indiasvg{width:100%;height:auto;display:block;max-height:560px}
+  .stp{fill:#e9eaee;stroke:#fff;stroke-width:.6;transition:fill .35s ease;cursor:pointer}
+  .stp:hover,.stp.hot{stroke:#2E2E38;stroke-width:1.2}
+  .maptip{position:absolute;pointer-events:none;background:var(--charcoal);color:#fff;padding:10px 12px;border-radius:8px;font-size:12px;min-width:172px;opacity:0;transition:opacity .12s;z-index:30;border-left:3px solid var(--ey-yellow);box-shadow:0 10px 30px rgba(0,0,0,.32)}
+  .maptip b{font-family:'Archivo'}
+  .maptip .trow{display:flex;justify-content:space-between;gap:14px;margin-top:3px}.maptip .trow span{color:#bdbdc8}
+  .maptip .tsub{margin-top:6px;padding-top:6px;border-top:1px solid #4a4a57;color:#bdbdc8;font-size:11px}.maptip .tno{color:#bdbdc8;margin-top:4px}
+  .legbar{height:12px;border-radius:6px;background:linear-gradient(90deg,#FFF7C2,#FFD400,#9C7A00)}
+  .leglab{display:flex;justify-content:space-between;font-size:11px;color:var(--muted);margin-top:5px}
+  .heatwrap{overflow-x:auto}
+  .heat{width:100%;border-collapse:collapse;font-size:12px;min-width:680px}
+  .heat th{font-family:'Archivo';font-size:10px;text-transform:uppercase;letter-spacing:.02em;color:var(--muted);padding:8px 6px;text-align:center;border-bottom:2px solid var(--line);font-weight:700}
+  .heat th.sortable{cursor:pointer;user-select:none}.heat th.sortable:hover{color:var(--charcoal)}
+  .heat th.rowh,.heat td.rowh{text-align:left;font-weight:700;color:var(--charcoal);white-space:nowrap}
+  .heat td{padding:8px 6px;text-align:center;border-bottom:1px solid #f0f0f3;font-weight:600;font-variant-numeric:tabular-nums}
+  .heat tr.totrow td{font-family:'Archivo';font-weight:800;background:#fafafb}
+  .heat td.totcol{font-family:'Archivo';font-weight:800;background:#fafafb}
+  table.subs{width:100%;border-collapse:collapse;font-size:13px}
+  table.subs th{font-family:'Archivo';font-size:11px;text-transform:uppercase;letter-spacing:.03em;color:var(--muted);text-align:left;padding:10px;border-bottom:2px solid var(--line);white-space:nowrap}
+  table.subs th.sortable{cursor:pointer;user-select:none}table.subs th.sortable:hover{color:var(--charcoal)}
+  table.subs td{padding:10px;border-bottom:1px solid var(--line);vertical-align:top}
+  table.subs tr:hover td{background:#fafafb}
+  .pill{display:inline-block;font-size:10.5px;font-weight:700;padding:2px 8px;border-radius:20px;background:#f0f0f3;color:var(--charcoal)}
+  .pill.H{background:#ffe1e1;color:#b32525}.pill.M{background:#fff2cc;color:#8a6d00}.pill.L{background:#e3f3f0;color:#1f6e64}
+  .del{background:none;border:none;color:var(--red);cursor:pointer;font-weight:700;font-size:12px;padding:4px 8px;border-radius:5px}.del:hover{background:#fde8e8}
+  .blank{text-align:center;padding:60px 20px;color:var(--muted)}.blank .big{font-family:'Archivo';font-weight:800;font-size:18px;color:var(--charcoal);margin-bottom:6px}
+  footer{max-width:1280px;margin:0 auto;padding:0 32px 40px;color:var(--muted);font-size:12px;display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px}
+</style>
+</head>
+<body>
+<header>
+  <div class="head-inner"><div class="brandrow">
+    <span class="ey-mark"><span class="beam"></span>EY</span>
+    <div class="head-titles"><h1>Skilled Manpower Demand Aggregation</h1>
+      <p>FMCG Value Chain &middot; Sub-Sector &amp; Geography-wise Demand Capture</p></div>
+    <span class="tag">Demand Aggregation Form</span>
+  </div></div>
+  <div class="tabbar">
+    <button class="tab active" data-tab="form">Submit Demand</button>
+    <button class="tab" data-tab="dash">Aggregated Demand <span class="badge" id="countBadge">0</span></button>
+  </div>
+</header>
+
+<div class="wrap">
+  <!-- FORM -->
+  <div class="view show" id="view-form">
+    <div class="notice">Select a value chain function, identify yourself, then capture demand for each sub-sector across the states/districts you cover. Add as many demand lines as needed — every submission is pooled into the aggregated dashboard.</div>
+    <div class="card mb">
+      <div class="card-h"><span class="step-no">1</span><h2>Value chain function <span class="req">*</span></h2><span class="sub">Where in the FMCG value chain are you reporting demand from?</span></div>
+      <div class="card-b"><div class="vc-pick" id="vcPick"></div></div>
+    </div>
+    <div class="card mb">
+      <div class="card-h"><span class="step-no">2</span><h2>Respondent details</h2><span class="sub">Who is reporting this demand</span></div>
+      <div class="card-b">
+        <div class="grid g3">
+          <div><label>Respondent name <span class="req">*</span></label><input id="f_name" placeholder="e.g. Ramesh Kumar"></div>
+          <div><label>Designation / role</label><input id="f_desig" placeholder="e.g. Regional HR Lead"></div>
+          <div><label>Organisation / business unit <span class="req">*</span></label><input id="f_org" placeholder="e.g. North Zone Operations"></div>
+        </div>
+        <div class="grid g3" style="margin-top:16px">
+          <div><label>Reporting date</label><input type="date" id="f_date"></div>
+          <div><label>Demand origin <span class="req">*</span></label><select id="f_origin"><option value="">Select origin…</option><option value="captive">Captive (In-house)</option><option value="vendor">Extended Ecosystem (Vendor)</option></select></div>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-h"><span class="step-no">3</span><h2>Demand by sub-sector &amp; geography</h2><span class="sub" id="demandHint">Select a value chain function above to begin</span></div>
+      <div class="card-b">
+        <div id="demandWrap" style="display:none">
+          <div class="lines"><table>
+            <thead><tr>
+              <th style="min-width:200px">Sub-sector</th><th style="min-width:150px">State</th><th style="min-width:160px">District / city</th>
+              <th>Open now</th><th>+6 months</th><th>+12 months</th><th>Priority</th><th></th>
+            </tr></thead><tbody id="lineBody"></tbody>
+          </table></div>
+          <div style="margin-top:12px"><button class="btn btn-ghost btn-sm" id="btnAddLine">+ Add demand line</button></div>
+        </div>
+        <div id="demandEmpty" class="empty-d">Pick a value chain function to load its sub-sectors and start capturing demand.</div>
+        <div class="actions">
+          <button class="btn btn-primary" id="btnSubmit" disabled>Submit demand &rarr;</button>
+          <button class="btn btn-ghost" id="btnReset">Clear form</button>
+          <span class="hint" id="formHint"></span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- DASHBOARD -->
+  <div class="view" id="view-dash">
+    <div class="toolbar"><h2>Aggregated demand dashboard</h2>
+      <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center">
+        <button class="btn btn-ghost btn-sm" id="btnSeed">↻ Load sample</button>
+        <button class="btn btn-ghost btn-sm" id="btnClear" style="color:var(--red)">Clear all</button>
+        <span style="width:1px;height:22px;background:var(--line)"></span>
+        <button class="btn btn-primary btn-sm" id="btnXlsx">⤓ Export Excel</button>
+        <button class="btn btn-ghost btn-sm" id="btnCsv">Export CSV</button>
+        <button class="btn btn-dark btn-sm" id="btnJson">Export JSON</button>
+      </div>
+    </div>
+    <div id="dashEmpty" class="card"><div class="blank"><div class="big">No demand submitted yet</div>Totals, a geographic demand map, sub-sector demand and a state × value-chain heatmap appear here once respondents start submitting.<div style="margin-top:18px"><button class="btn btn-primary" id="btnSeedEmpty">↻ Load sample data</button></div></div></div>
+    <div id="dashBody" style="display:none">
+      <div class="kpis">
+        <div class="kpi"><div class="lab">Submissions</div><div class="val" id="kSubs">0</div><div class="sub" id="kLines">0 demand lines</div></div>
+        <div class="kpi"><div class="lab">Open positions now</div><div class="val" id="kCur">0</div><div class="sub">vacant today</div></div>
+        <div class="kpi"><div class="lab">Demand · +6 months</div><div class="val" id="k6">0</div><div class="sub">projected need</div></div>
+        <div class="kpi"><div class="lab">Demand · +12 months</div><div class="val" id="k12">0</div><div class="sub">total skilling target</div></div>
+        <div class="kpi"><div class="lab">Demand origin (+12m)</div><div class="val" id="kOriVal" style="font-size:22px">—</div><div class="sub" id="kOriSub"></div></div>
+      </div>
+      <div class="chips" id="chips"></div>
+      <div class="card mb"><div class="card-b" style="padding:16px 20px"><div class="filtbar">
+        <div class="fitem"><label>Value chain</label><select id="fl_vc"><option value="">All</option></select></div>
+        <div class="fitem" style="max-width:210px"><label>Demand origin</label><select id="fl_origin"><option value="">All</option><option value="captive">Captive (In-house)</option><option value="vendor">Extended Ecosystem (Vendor)</option></select></div>
+        <div class="fitem"><label>State / UT</label><select id="fl_state"><option value="">All</option></select></div>
+        <div class="fitem"><label>Sub-sector</label><select id="fl_sub"><option value="">All</option></select></div>
+        <div class="fitem" style="max-width:160px"><label>Priority</label><select id="fl_pri"><option value="">All</option><option value="H">High</option><option value="M">Medium</option><option value="L">Low</option><option value="_">Unspecified</option></select></div>
+        <button class="btn btn-ghost btn-sm" id="btnClearF" style="align-self:end">Clear filters</button>
+      </div><div class="hint" id="filtInfo" style="margin-top:10px"></div></div></div>
+      <div class="metricbar"><span style="font-family:'Archivo';font-weight:700;font-size:13px">Time horizon:</span>
+        <div class="metric-toggle" id="metricToggle">
+          <button data-m="current">Open now</button><button data-m="m6">+6 months</button><button data-m="m12" class="on">+12 months</button><button data-m="all">All (whole)</button>
+        </div>
+      </div>
+
+      <div class="card mb">
+        <div class="card-h"><span class="step-no" style="background:var(--ey-yellow);color:var(--charcoal)">◈</span><h2>Geographic demand distribution</h2><span class="sub" id="mapSub"></span></div>
+        <div class="card-b"><div class="mapgrid">
+          <div>
+            <div id="mapWrap"></div>
+            <div style="margin-top:10px"><div class="legbar"></div><div class="leglab"><span>0</span><span id="mapMax">0</span></div></div>
+          </div>
+          <div>
+            <h2 style="font-size:15px;margin-bottom:4px">Top states</h2><div class="sub" id="stSub" style="color:var(--muted);font-size:12px;margin-bottom:10px"></div>
+            <div id="stateBars"></div>
+          </div>
+        </div></div>
+      </div>
+
+      <div class="card mb">
+        <div class="card-h"><span class="step-no" style="background:var(--ey-yellow);color:var(--charcoal)">▦</span><h2>Demand heatmap — State &times; Value chain</h2><span class="sub" id="heatSub"></span></div>
+        <div class="card-b"><div class="heatwrap"><table class="heat" id="heat"></table></div></div>
+      </div>
+
+      <div class="dash-grid mb">
+        <div class="card">
+          <div class="card-h"><span class="step-no" style="background:var(--ey-yellow);color:var(--charcoal)">▣</span><h2>Demand by sub-sector</h2><span class="sub" id="subSub"></span></div>
+          <div class="card-b"><div id="subBars"></div></div>
+        </div>
+        <div>
+          <div class="card mb"><div class="card-h"><h2 style="font-size:15px">By value chain</h2></div><div class="card-b"><div id="vcBars"></div></div></div>
+          <div class="card mb"><div class="card-h"><h2 style="font-size:15px">By priority</h2></div><div class="card-b"><div class="seg" id="priSeg"></div><div class="legend" id="priLeg"></div></div></div>
+          <div class="card"><div class="card-h"><h2 style="font-size:15px">By demand origin</h2></div><div class="card-b"><div class="seg" id="oriSeg"></div><div class="legend" id="oriLeg"></div></div></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-h"><h2 style="font-size:15px">Submission log</h2><span class="sub">Click any column to sort</span></div>
+        <div class="card-b" style="overflow-x:auto"><table class="subs" id="subsTable"></table></div>
+      </div>
+    </div>
+  </div>
+</div>
+<footer><span>EY · Skilled Manpower Demand Estimation — internal use</span><span id="storageMode"></span></footer>
+<div class="toast" id="toast"></div>
+
+<script>
+/* ===== embedded India geography ===== */
+const INDIA = {"viewBox":"0 0 640 714","w":640,"h":714,"paths":{"Mizoram":"M530.0 354.9L528.1 338.1L526.8 335.0L525.1 333.6L525.6 330.8L524.6 326.7L525.8 326.0L523.0 317.4L522.7 313.4L524.1 311.1L524.3 304.9L523.5 303.5L526.2 303.4L526.5 305.6L528.6 305.0L528.9 303.4L530.2 303.2L530.5 301.5L531.9 301.0L533.4 297.3L534.3 299.5L536.3 300.1L538.7 299.6L539.0 303.7L538.0 306.5L542.9 308.1L547.0 310.8L547.5 320.0L546.8 320.7L547.1 323.2L546.1 324.5L546.9 327.1L546.1 330.5L544.9 332.1L542.7 330.9L541.1 332.0L541.6 333.8L540.5 338.9L541.6 341.8L541.3 344.3L542.5 345.4L542.8 348.8L541.9 351.0L539.6 350.6L538.5 354.0L537.2 354.8L532.2 351.7L531.9 354.3L530.0 354.9Z","Tamil Nadu":"M203.2 665.9L203.4 664.3L201.2 660.5L203.1 657.3L200.8 654.3L203.3 651.0L203.6 647.7L206.2 642.5L204.4 640.7L203.4 641.4L201.2 640.5L202.9 636.2L202.2 634.4L203.7 626.2L201.5 623.3L197.2 626.5L195.3 625.6L193.7 621.8L194.2 617.8L195.6 613.5L194.0 611.5L190.3 609.9L192.4 606.7L191.1 604.7L191.4 603.0L189.7 604.0L185.7 603.9L187.4 602.3L188.0 600.2L181.3 596.4L184.4 594.7L185.2 593.0L187.2 592.3L188.2 594.2L194.4 594.8L194.1 593.4L195.7 590.2L197.9 589.7L200.0 590.7L203.8 589.9L206.7 590.8L208.1 586.8L212.0 586.6L214.1 582.9L213.5 581.9L210.6 580.7L208.4 580.9L207.7 579.9L210.7 577.0L211.1 574.2L210.1 573.6L210.4 570.1L213.4 570.0L215.3 565.5L217.4 565.0L218.5 566.2L220.1 565.8L221.8 567.5L223.9 568.0L225.4 570.1L227.7 571.0L231.5 567.5L232.2 562.6L237.9 560.2L243.7 562.0L245.2 560.0L245.1 558.8L246.3 559.6L249.6 558.1L248.9 554.7L251.7 554.6L251.6 556.1L254.8 555.6L255.2 557.3L257.2 556.9L257.5 555.1L260.4 554.1L262.3 550.0L263.2 551.2L266.1 551.2L267.3 549.4L268.5 552.2L268.9 556.1L267.0 567.5L264.5 576.0L258.5 584.3L258.1 586.5L257.0 586.4L254.8 588.2L257.4 589.0L256.4 594.1L258.5 604.4L258.4 608.8L256.2 608.6L255.7 610.1L257.7 611.3L258.3 612.5L258.6 625.0L248.5 624.2L245.9 626.2L245.1 628.4L245.6 630.4L239.8 638.7L238.1 643.8L241.6 647.7L247.4 647.4L246.7 648.9L244.6 648.2L237.5 648.6L231.2 651.5L227.1 652.4L223.8 655.2L222.6 657.2L222.4 659.0L223.1 660.3L221.9 661.9L222.0 666.0L220.1 668.9L215.5 671.8L214.5 673.8L210.2 674.4L209.5 675.8L202.6 673.4L199.7 670.9L203.2 665.9Z","Madhya Pradesh":"M186.7 373.8L186.5 374.8L184.5 376.5L179.9 376.4L179.7 372.4L178.3 369.7L163.2 369.5L159.5 368.7L157.3 367.6L156.1 365.2L152.1 363.6L150.2 364.1L146.1 362.9L144.5 361.5L144.9 357.2L143.3 356.1L142.9 354.5L139.7 356.7L136.8 356.3L135.7 354.8L136.3 350.3L134.8 348.3L135.2 347.0L137.7 347.8L138.3 345.0L136.2 345.5L134.9 342.5L136.9 343.2L139.3 340.4L141.8 340.6L142.3 338.4L143.6 336.4L143.5 334.3L142.1 334.6L140.5 330.8L141.9 329.6L144.5 330.2L149.3 327.1L145.0 324.8L145.9 322.5L150.2 319.7L151.7 319.5L153.3 316.8L153.7 314.5L152.9 312.0L154.5 308.2L152.4 305.1L153.1 304.3L152.2 303.5L149.8 303.6L150.3 301.3L151.9 299.4L151.1 298.3L148.6 298.0L150.4 295.6L150.2 293.9L150.8 292.2L152.6 294.5L154.8 293.2L154.5 291.5L152.0 290.7L151.3 288.4L152.9 287.7L154.1 289.4L155.8 289.7L157.5 288.9L157.4 286.9L159.1 285.3L162.5 285.7L162.2 287.2L158.9 291.9L164.7 293.5L166.7 293.0L168.0 293.4L171.7 291.6L174.6 296.6L174.2 298.9L171.8 298.7L170.5 300.0L172.3 303.5L171.0 305.8L172.8 307.8L170.0 309.9L166.1 308.6L164.8 311.0L167.0 312.5L167.4 313.8L169.7 315.0L171.9 312.2L175.0 311.5L177.2 307.6L179.0 307.1L178.8 304.7L183.2 303.5L188.5 304.3L190.0 302.9L190.7 304.7L193.4 306.4L195.1 306.1L196.0 304.3L194.0 300.9L193.7 296.8L194.7 296.5L197.1 298.5L199.1 296.3L198.3 292.8L196.5 291.7L194.5 292.0L193.5 290.5L196.5 289.1L194.7 287.0L195.0 285.2L197.6 284.4L199.4 284.8L201.3 283.6L203.4 283.5L204.3 284.2L206.0 283.4L206.4 281.0L205.4 276.6L204.3 276.2L202.6 277.4L202.4 278.8L199.4 278.4L196.5 279.6L194.6 278.5L192.5 278.7L190.6 278.1L187.3 274.0L187.0 270.7L187.9 266.8L190.0 265.2L191.6 265.3L193.1 264.4L195.5 260.9L203.4 256.9L206.9 253.8L209.1 253.6L213.5 250.7L215.2 250.4L216.9 247.9L218.9 247.1L220.8 247.5L221.3 244.8L226.6 243.1L227.3 244.3L230.5 245.5L235.5 245.4L237.5 247.0L240.4 247.6L240.0 249.7L243.1 252.9L243.2 255.3L240.1 258.5L240.5 261.2L239.1 262.4L238.9 264.2L235.2 269.5L236.2 271.8L234.2 272.2L232.9 273.2L228.5 272.9L227.3 275.9L226.2 276.1L226.3 278.5L228.4 283.3L226.1 284.2L226.3 285.8L222.6 289.0L224.8 293.9L224.6 298.8L226.8 300.5L225.9 301.6L227.2 303.1L229.6 300.1L236.1 305.0L239.6 301.1L239.9 299.0L238.4 298.6L239.2 296.5L237.7 294.4L234.9 295.3L235.5 292.9L235.3 289.3L233.3 288.5L232.4 287.1L232.6 284.5L229.8 279.8L233.0 277.3L235.4 278.0L234.5 275.6L237.8 274.2L239.0 274.8L237.7 277.2L239.4 278.2L237.7 282.5L238.7 281.3L241.6 281.0L243.0 283.6L245.5 283.5L247.1 282.7L245.8 279.8L246.2 278.6L247.7 278.5L249.5 280.3L248.5 282.2L248.9 283.6L250.7 284.3L252.4 282.2L254.6 283.3L256.2 282.9L258.1 283.8L258.5 281.7L262.2 278.2L266.2 277.0L268.3 277.2L268.2 279.5L270.2 280.5L270.7 282.1L267.2 285.5L268.8 285.8L270.1 284.5L271.7 286.7L272.2 285.2L274.2 284.0L276.8 284.6L277.0 283.4L279.5 281.8L280.3 284.6L279.2 285.4L279.9 287.8L281.7 286.9L285.4 288.3L286.2 288.1L288.5 284.9L288.8 282.3L291.2 283.1L293.5 282.7L294.4 281.8L296.2 282.4L297.1 284.7L301.9 286.4L302.9 289.7L308.8 290.9L310.5 295.2L313.1 295.5L313.1 294.1L318.4 293.1L319.2 294.5L320.6 294.3L321.1 295.9L319.3 300.4L320.6 300.6L320.0 305.3L318.3 306.2L321.5 310.0L318.9 311.0L317.7 312.9L314.8 314.1L308.6 312.5L305.9 313.4L302.5 312.1L300.1 313.6L298.3 312.8L297.1 310.9L295.7 311.8L297.7 315.6L295.9 316.9L295.9 320.4L299.0 319.5L300.3 320.3L302.4 319.9L303.8 322.6L306.3 323.0L308.4 324.9L306.8 329.8L302.9 330.3L303.1 332.6L301.2 334.7L299.4 335.1L299.8 337.6L296.7 341.0L296.1 342.8L293.0 343.9L289.8 343.1L288.1 344.6L287.0 343.9L285.2 345.2L285.4 348.5L283.8 349.7L282.9 353.8L280.9 352.7L278.9 360.7L277.6 360.7L276.8 363.0L277.3 367.3L275.6 370.5L274.8 370.8L270.5 368.1L267.3 364.0L264.1 364.2L262.9 365.4L259.8 366.1L256.0 364.3L251.7 365.8L250.8 362.7L245.2 361.7L245.0 363.3L238.4 364.6L238.1 366.7L231.4 367.0L229.8 366.1L228.2 366.8L227.9 365.1L226.2 364.7L223.7 365.5L219.6 368.5L216.5 369.4L214.7 368.8L208.0 369.6L207.3 365.5L209.9 366.1L209.2 362.0L207.8 360.5L203.6 360.8L202.1 362.3L198.9 361.8L197.6 362.3L195.5 364.5L194.5 364.1L193.0 365.4L193.0 367.5L189.5 370.6L190.4 371.7L189.6 374.0L186.7 373.8Z","Maharashtra":"M140.4 480.6L140.4 485.8L141.6 487.3L143.9 487.6L143.9 490.0L141.6 491.5L143.6 492.5L141.1 498.8L138.8 499.2L138.2 498.4L136.3 499.8L136.2 501.4L133.5 502.3L132.4 499.3L127.0 499.6L124.9 495.4L123.3 494.8L120.2 485.0L119.9 479.2L118.3 472.8L118.5 467.7L117.1 464.2L117.6 462.9L116.3 461.5L116.2 456.9L111.8 444.4L111.7 441.7L113.0 441.2L110.6 439.1L110.1 436.6L111.0 434.8L109.3 431.2L109.6 428.9L108.2 426.5L109.0 423.2L107.8 421.3L108.1 417.3L105.0 405.0L105.2 402.8L106.7 401.9L106.2 399.5L109.7 396.0L111.6 396.4L111.6 398.3L115.3 399.3L117.7 398.4L118.8 396.4L121.3 396.5L121.0 392.4L122.4 389.8L122.5 387.8L121.1 386.9L122.5 384.7L125.5 386.8L126.3 388.2L128.3 388.2L130.2 386.9L131.0 384.4L131.9 384.6L132.5 381.9L131.3 379.8L126.6 374.7L129.8 374.2L129.9 372.0L132.5 371.3L132.8 369.1L134.7 368.0L140.5 366.7L139.6 365.3L137.2 365.1L130.2 366.2L129.7 363.4L131.2 361.8L130.0 360.7L129.8 358.9L136.8 356.3L139.7 356.7L142.9 354.5L143.3 356.1L144.9 357.2L144.5 361.5L146.1 362.9L150.2 364.1L152.1 363.6L156.1 365.2L157.3 367.6L159.5 368.7L163.2 369.5L178.3 369.7L179.7 372.4L179.9 376.4L184.5 376.5L186.5 374.8L186.7 373.8L189.6 374.0L190.4 371.7L189.5 370.6L193.0 367.5L193.0 365.4L194.5 364.1L195.5 364.5L197.6 362.3L198.9 361.8L202.1 362.3L203.6 360.8L207.8 360.5L209.2 362.0L209.9 366.1L207.3 365.5L208.0 369.6L214.7 368.8L216.5 369.4L219.6 368.5L223.7 365.5L226.2 364.7L227.9 365.1L228.2 366.8L229.8 366.1L231.4 367.0L238.1 366.7L238.4 364.6L245.0 363.3L245.2 361.7L250.8 362.7L251.7 365.8L256.0 364.3L259.8 366.1L262.9 365.4L264.1 364.2L267.3 364.0L270.5 368.1L274.8 370.8L275.6 370.5L274.6 373.0L271.4 374.2L270.9 376.0L271.4 379.9L273.2 379.7L273.9 385.7L272.6 387.9L274.7 387.8L274.1 392.2L274.9 393.6L270.0 395.6L270.7 398.1L272.3 397.9L273.1 398.9L272.8 402.6L271.5 405.2L273.2 405.4L273.5 406.8L275.9 408.1L276.8 410.1L280.6 412.3L279.7 415.9L277.5 417.7L274.6 417.1L273.8 415.1L271.8 416.5L269.9 420.0L268.6 420.9L267.3 425.6L269.0 427.8L267.4 429.7L267.4 430.7L264.1 431.6L259.7 428.3L260.7 427.4L260.2 423.5L258.5 421.9L260.0 420.6L261.1 415.1L260.3 413.4L257.4 410.9L256.1 410.2L250.3 412.7L248.0 411.0L245.6 410.6L244.3 413.7L242.3 412.0L238.9 411.6L239.3 409.2L237.2 408.4L236.9 406.7L231.2 405.4L228.1 405.5L227.0 404.0L225.4 403.3L226.7 406.3L226.2 407.8L224.8 408.3L225.5 413.2L223.4 414.4L222.6 418.8L219.8 418.0L217.7 416.4L216.0 417.3L215.9 420.1L214.6 422.6L215.6 426.4L217.8 427.9L215.5 428.8L214.4 431.6L213.2 432.0L213.4 434.5L210.3 434.7L210.1 437.0L208.8 438.7L209.4 440.6L207.5 441.3L206.3 440.4L206.4 438.3L204.4 437.1L203.3 437.6L199.0 443.8L196.6 443.0L195.9 444.6L196.6 446.4L195.6 447.1L195.9 449.2L192.8 450.1L192.1 449.6L193.2 451.3L191.5 452.4L190.9 454.6L187.5 452.8L186.7 455.1L183.4 456.6L183.4 459.5L184.2 460.3L184.5 463.1L181.2 461.9L174.8 462.9L174.1 461.1L172.3 461.8L168.5 459.3L167.2 461.5L167.9 463.3L169.0 464.0L168.3 466.3L169.3 467.7L169.2 470.8L164.9 470.6L161.0 471.3L160.6 473.5L158.9 473.9L156.9 471.4L152.9 473.5L153.3 475.6L148.5 476.9L147.1 479.9L145.9 480.6L145.3 478.7L140.4 480.6Z","Chhattisgarh":"M296.9 439.3L294.1 441.8L293.1 447.8L291.4 449.8L291.3 451.5L288.5 451.7L286.4 450.6L284.6 452.0L283.2 452.0L282.2 446.2L282.4 443.5L280.0 444.1L279.7 442.6L277.6 443.4L276.6 437.2L275.1 435.3L271.2 432.8L269.5 433.2L267.4 430.7L267.4 429.7L269.0 427.8L267.3 425.6L268.6 420.9L269.9 420.0L271.8 416.5L273.8 415.1L274.6 417.1L277.5 417.7L279.7 415.9L280.6 412.3L276.8 410.1L275.9 408.1L273.5 406.8L273.2 405.4L271.5 405.2L272.8 402.6L273.1 398.9L272.3 397.9L270.7 398.1L270.0 395.6L274.9 393.6L274.1 392.2L274.7 387.8L272.6 387.9L273.9 385.7L273.2 379.7L271.4 379.9L270.9 376.0L271.4 374.2L274.6 373.0L277.3 367.3L276.8 363.0L277.6 360.7L278.9 360.7L280.9 352.7L282.9 353.8L283.8 349.7L285.4 348.5L285.2 345.2L287.0 343.9L288.1 344.6L289.8 343.1L293.0 343.9L296.1 342.8L296.7 341.0L299.8 337.6L299.4 335.1L301.2 334.7L303.1 332.6L302.9 330.3L306.8 329.8L308.4 324.9L306.3 323.0L303.8 322.6L302.4 319.9L300.3 320.3L299.0 319.5L295.9 320.4L295.9 316.9L297.7 315.6L295.7 311.8L297.1 310.9L298.3 312.8L300.1 313.6L302.5 312.1L305.9 313.4L308.6 312.5L314.8 314.1L317.7 312.9L318.9 311.0L321.5 310.0L324.3 312.1L327.4 312.1L329.9 310.9L332.5 306.8L334.7 307.2L337.6 312.3L340.5 313.3L342.0 318.1L345.4 319.1L347.1 317.6L347.1 320.6L346.0 323.3L348.3 324.5L347.6 328.2L348.1 329.5L350.6 332.6L354.7 332.7L355.2 333.8L351.8 339.3L350.0 340.5L348.5 340.5L347.0 342.0L347.8 344.4L347.0 346.6L343.8 347.3L338.8 350.5L336.9 354.1L338.1 359.2L335.3 362.2L335.8 363.4L333.6 363.9L332.6 366.7L333.9 368.9L333.8 370.3L331.2 369.5L329.5 375.0L327.1 375.6L324.7 374.2L317.8 374.7L317.8 376.2L316.1 379.4L314.6 380.3L313.9 382.2L311.4 381.1L312.2 386.7L311.2 388.3L313.5 391.3L312.7 393.4L313.1 396.5L312.4 397.9L312.6 400.0L319.4 401.5L319.0 405.1L316.8 406.4L315.5 404.0L313.6 403.3L311.5 405.0L309.9 401.8L308.1 401.6L305.6 399.9L304.5 400.1L303.0 398.8L301.5 400.1L300.8 402.4L301.4 403.5L303.5 404.5L303.8 405.8L305.5 406.1L304.8 412.6L306.3 412.4L306.8 414.4L308.2 414.4L307.6 419.6L309.4 426.1L307.9 426.5L307.5 429.1L306.1 430.3L302.0 432.1L302.2 434.2L299.2 437.7L298.8 439.1L296.9 439.3Z","Gujarat":"M66.1 385.4L58.0 381.7L50.4 375.6L42.2 365.9L35.1 359.1L35.6 357.8L34.7 358.9L31.8 356.2L26.4 349.8L25.8 348.0L27.3 345.1L30.6 347.2L31.0 350.3L34.4 348.0L37.6 347.4L38.7 346.5L40.4 346.6L45.6 344.5L47.9 342.7L51.1 342.5L53.2 340.0L53.1 338.7L57.0 334.4L58.0 335.8L60.4 331.5L63.2 329.5L63.8 327.8L59.2 328.1L57.5 327.2L55.1 327.2L52.0 330.6L50.2 334.0L41.0 336.9L30.0 335.1L19.3 328.3L17.2 325.7L17.6 324.0L14.4 322.5L14.7 321.0L12.8 320.7L12.5 318.8L8.9 318.3L8.0 316.5L9.5 316.1L10.3 312.0L13.1 309.9L21.9 309.8L22.1 302.3L23.9 303.6L26.0 302.2L27.2 304.0L29.2 302.8L31.3 303.7L33.8 302.7L37.6 303.0L39.8 302.4L42.8 305.2L49.0 305.2L50.8 302.4L60.7 299.4L60.7 303.3L65.6 304.1L69.5 300.7L70.8 300.9L72.0 299.1L69.7 298.9L69.5 295.4L72.2 293.6L75.9 294.9L80.0 293.5L82.7 293.6L83.8 294.4L92.3 292.7L94.6 294.8L98.2 294.6L98.6 296.2L101.7 299.5L102.2 297.6L105.6 298.5L106.6 300.7L111.5 300.8L112.4 298.1L114.2 297.7L114.0 300.0L115.6 301.0L113.8 304.7L117.0 307.4L117.6 309.1L119.1 307.9L121.0 308.2L121.3 310.9L120.4 311.3L120.2 313.4L123.5 318.2L124.6 317.1L126.4 317.9L125.7 321.8L128.5 321.7L130.1 322.4L131.4 324.5L132.8 323.4L133.3 324.4L136.7 326.0L136.4 328.1L139.0 327.9L142.1 334.6L143.5 334.3L143.6 336.4L142.3 338.4L141.8 340.6L139.3 340.4L136.9 343.2L134.9 342.5L136.2 345.5L138.3 345.0L137.7 347.8L135.2 347.0L134.8 348.3L136.3 350.3L135.7 354.8L136.8 356.3L129.8 358.9L130.0 360.7L131.2 361.8L129.7 363.4L130.2 366.2L137.2 365.1L139.6 365.3L140.5 366.7L134.7 368.0L132.8 369.1L132.5 371.3L129.9 372.0L129.8 374.2L126.6 374.7L131.3 379.8L132.5 381.9L131.9 384.6L131.0 384.4L130.2 386.9L128.3 388.2L126.3 388.2L125.5 386.8L122.5 384.7L121.1 386.9L122.5 387.8L122.4 389.8L121.0 392.4L121.3 396.5L118.8 396.4L117.7 398.4L116.9 398.5L115.3 396.7L115.9 394.6L113.3 393.8L111.0 394.4L111.6 396.4L109.7 396.0L107.6 398.2L106.9 395.7L107.7 393.5L110.0 390.6L110.3 388.0L106.5 377.1L107.1 376.8L104.3 375.9L104.7 373.4L103.8 370.9L105.0 370.3L105.8 367.6L106.8 367.3L106.1 366.1L104.1 364.8L106.0 363.4L102.6 361.3L104.3 359.6L101.9 356.5L103.2 351.0L104.9 350.2L107.1 351.2L109.6 350.3L111.3 348.4L105.1 348.8L102.1 347.8L100.9 349.3L99.1 347.9L95.4 357.7L96.2 359.2L95.2 361.0L97.7 363.8L96.1 367.7L93.4 371.3L93.5 373.6L80.7 379.5L79.1 381.2L70.8 384.4L68.1 384.2L66.1 385.4ZM98.7 359.8L97.7 358.9L97.3 356.0L99.1 354.5L100.4 356.9L98.7 359.8Z","Odisha":"M311.6 443.3L310.9 446.3L309.5 447.5L307.7 446.1L304.8 445.7L303.7 447.0L300.1 448.3L296.0 451.4L291.3 451.5L291.4 449.8L293.1 447.8L294.1 441.8L296.9 439.3L298.8 439.1L299.2 437.7L302.2 434.2L302.0 432.1L306.1 430.3L307.5 429.1L307.9 426.5L309.4 426.1L307.6 419.6L308.2 414.4L306.8 414.4L306.3 412.4L304.8 412.6L305.5 406.1L303.8 405.8L303.5 404.5L301.4 403.5L300.8 402.4L301.5 400.1L303.0 398.8L304.5 400.1L305.6 399.9L308.1 401.6L309.9 401.8L311.5 405.0L313.6 403.3L315.5 404.0L316.8 406.4L319.0 405.1L319.4 401.5L312.6 400.0L312.4 397.9L313.1 396.5L312.7 393.4L313.5 391.3L311.2 388.3L312.2 386.7L311.4 381.1L313.9 382.2L314.6 380.3L316.1 379.4L317.8 376.2L317.8 374.7L324.7 374.2L327.1 375.6L329.5 375.0L331.2 369.5L333.8 370.3L333.9 368.9L332.6 366.7L333.6 363.9L335.8 363.4L335.3 362.2L338.1 359.2L336.9 354.1L338.8 350.5L343.8 347.3L347.0 346.6L347.8 344.4L347.0 343.0L349.1 344.2L351.0 346.5L353.0 347.3L355.9 347.1L358.2 345.3L362.7 345.5L364.0 344.7L367.2 344.9L369.6 343.9L369.7 349.3L368.7 352.4L371.9 353.5L373.1 355.0L373.9 353.3L376.5 351.4L382.6 353.9L384.0 353.5L384.8 355.5L387.2 355.6L389.6 352.5L390.1 350.8L388.8 349.5L390.0 347.5L389.8 345.4L388.6 344.0L390.8 342.4L391.9 344.0L395.4 344.9L397.0 347.2L398.5 347.9L400.0 347.2L404.9 350.2L407.2 352.9L409.9 353.2L411.3 354.3L410.7 357.2L412.8 358.3L413.0 356.9L415.9 356.0L416.0 358.5L416.7 359.7L420.1 360.5L421.0 364.1L419.4 365.7L413.8 366.5L409.6 370.0L407.7 373.3L407.5 376.1L410.2 381.4L410.0 383.0L407.8 383.2L406.5 384.3L407.7 383.4L411.2 383.5L411.9 384.8L406.2 388.9L405.1 390.6L405.9 393.5L400.7 397.1L397.3 401.7L394.2 403.5L382.5 407.1L375.6 410.7L367.7 417.0L363.1 422.5L361.7 421.5L360.0 422.3L359.4 423.7L357.7 423.1L353.6 429.1L351.5 428.9L348.7 429.8L347.5 428.5L344.4 428.5L342.4 423.9L341.4 424.4L341.6 426.3L339.6 422.0L335.7 423.5L335.2 425.3L332.9 423.9L332.2 424.9L334.2 427.2L329.8 430.0L328.3 429.2L325.4 433.3L326.4 434.7L325.9 436.8L327.1 438.0L324.8 439.0L321.3 436.9L320.6 439.4L316.6 440.9L317.1 438.9L314.5 435.1L311.9 437.6L312.3 438.8L310.8 443.0L311.6 443.3Z","Andhra Pradesh":"M243.7 562.0L237.9 560.2L234.9 561.2L232.2 562.6L231.5 567.5L227.7 571.0L225.4 570.1L223.9 568.0L224.3 565.7L225.6 565.7L226.5 563.8L228.9 563.0L231.4 556.1L228.4 555.3L226.7 554.1L227.5 548.9L223.1 549.3L223.3 548.0L221.5 546.0L221.4 542.6L218.9 542.4L218.3 540.4L215.0 541.4L214.3 543.6L207.3 546.7L207.6 545.0L206.8 543.0L204.6 543.2L201.5 542.4L201.0 543.9L199.0 545.3L197.1 543.4L198.5 541.0L196.2 538.7L196.5 537.2L195.4 535.5L197.7 534.9L198.2 538.0L201.3 539.1L204.5 538.7L206.1 541.6L206.9 540.6L205.9 539.0L206.0 535.4L208.3 535.8L207.8 532.7L206.3 531.7L205.4 533.1L200.6 531.7L200.1 534.2L197.7 534.0L195.1 531.4L195.5 528.1L193.5 527.2L192.6 525.5L194.8 517.1L192.5 516.6L193.4 514.2L197.3 516.0L200.0 515.6L200.9 513.2L200.3 511.2L200.8 509.7L199.0 508.8L198.3 506.4L198.3 501.8L199.4 501.2L198.2 497.1L199.2 495.4L202.9 494.2L211.7 496.0L214.7 496.3L216.5 495.5L220.7 497.0L222.6 496.6L224.4 493.2L227.7 491.6L230.7 492.4L231.7 491.4L234.7 493.2L238.6 490.5L238.2 489.1L240.9 487.8L243.6 488.5L244.8 488.2L244.9 481.6L245.7 480.3L249.1 480.0L249.8 479.1L257.1 476.7L260.4 478.7L262.7 476.2L262.7 471.0L265.5 469.9L268.1 470.9L268.4 473.1L273.7 475.7L274.4 472.2L272.9 471.2L269.3 470.9L273.9 466.8L279.5 469.4L280.2 468.7L280.3 466.6L281.6 465.3L282.7 465.9L286.5 465.0L286.9 462.9L288.7 463.0L289.4 460.9L283.3 458.4L280.9 455.6L280.4 453.4L282.3 452.4L284.1 453.5L284.6 452.0L286.4 450.6L288.5 451.7L296.0 451.4L300.1 448.3L303.7 447.0L304.8 445.7L307.7 446.1L309.5 447.5L310.9 446.3L311.6 443.3L310.8 443.0L312.3 438.8L311.9 437.6L314.5 435.1L317.1 438.9L316.6 440.9L320.6 439.4L321.3 436.9L324.8 439.0L327.1 438.0L325.9 436.8L326.4 434.7L325.4 433.3L328.3 429.2L329.8 430.0L334.2 427.2L332.2 424.9L332.9 423.9L335.2 425.3L335.7 423.5L339.6 422.0L341.6 426.3L341.4 424.4L342.4 423.9L344.4 428.5L347.5 428.5L348.7 429.8L351.5 428.9L353.6 429.1L357.7 423.1L359.4 423.7L360.0 422.3L361.7 421.5L363.0 422.6L354.3 434.5L349.9 438.7L349.5 440.1L339.6 445.5L334.4 450.6L332.8 453.6L328.9 457.4L315.7 464.6L310.9 469.0L309.4 471.8L309.4 473.2L311.9 473.7L310.8 480.5L298.1 486.2L291.2 485.5L288.5 487.0L287.4 488.6L286.0 493.9L283.2 496.8L283.0 499.0L281.5 499.9L279.2 500.1L278.0 496.4L276.0 496.0L273.0 496.8L268.3 499.7L266.9 501.8L265.9 505.5L264.2 507.9L262.4 516.2L263.9 522.4L265.7 525.9L264.3 534.2L264.6 538.5L267.0 544.4L266.5 547.3L267.3 549.4L266.1 551.2L263.2 551.2L262.3 550.0L260.4 554.1L257.5 555.1L257.2 556.9L255.2 557.3L254.8 555.6L251.6 556.1L251.7 554.6L248.9 554.7L249.6 558.1L246.3 559.6L245.1 558.8L245.2 560.0L243.7 562.0ZM309.8 477.4L309.9 476.7L308.1 476.4L308.4 476.8L309.8 477.4Z","Karnataka":"M176.4 587.1L173.5 586.6L171.9 584.2L167.3 581.9L165.3 578.8L163.8 578.8L164.0 576.9L162.8 576.0L163.9 574.0L161.0 573.4L157.4 569.8L152.2 568.0L151.2 566.0L148.0 547.8L146.1 541.1L144.7 539.7L142.1 529.8L139.4 525.0L139.3 522.9L136.2 521.3L135.5 518.7L138.0 518.1L140.0 515.4L139.5 514.1L140.4 512.1L139.2 510.8L140.6 509.9L140.6 507.9L139.6 507.4L139.0 505.1L139.6 504.4L138.7 501.0L136.2 501.4L136.3 499.8L138.2 498.4L138.8 499.2L141.1 498.8L143.6 492.5L141.6 491.5L143.9 490.0L143.9 487.6L141.6 487.3L140.4 485.8L140.4 480.6L145.3 478.7L145.9 480.6L147.1 479.9L148.5 476.9L153.3 475.6L152.9 473.5L156.9 471.4L158.9 473.9L160.6 473.5L161.0 471.3L164.9 470.6L169.2 470.8L169.3 467.7L168.3 466.3L169.0 464.0L167.9 463.3L167.2 461.5L168.5 459.3L172.3 461.8L174.1 461.1L174.8 462.9L181.2 461.9L184.5 463.1L184.2 460.3L183.4 459.5L183.4 456.6L186.7 455.1L187.5 452.8L190.9 454.6L191.5 452.4L193.2 451.3L192.1 449.6L192.8 450.1L195.9 449.2L195.6 447.1L196.6 446.4L195.9 444.6L196.6 443.0L199.0 443.8L203.3 437.6L204.4 437.1L206.4 438.3L206.3 440.4L207.5 441.3L209.4 440.6L210.4 441.0L209.6 442.8L210.4 445.2L209.3 446.0L211.6 448.0L207.3 454.3L207.1 456.9L212.2 458.6L208.5 460.4L205.7 465.2L205.4 466.7L207.5 467.8L208.2 469.4L207.4 473.0L207.8 475.2L206.7 476.8L207.3 479.2L206.5 481.4L202.8 482.5L203.7 483.9L210.3 485.5L208.3 488.3L208.6 495.0L202.9 494.2L199.2 495.4L198.2 497.1L199.4 501.2L198.3 501.8L198.3 506.4L199.0 508.8L200.8 509.7L200.3 511.2L200.9 513.2L200.0 515.6L197.3 516.0L193.4 514.2L192.5 516.6L194.8 517.1L192.6 525.5L193.5 527.2L195.5 528.1L195.1 531.4L197.7 534.0L200.1 534.2L200.6 531.7L205.4 533.1L206.3 531.7L207.8 532.7L208.3 535.8L206.0 535.4L205.9 539.0L206.9 540.6L206.1 541.6L204.5 538.7L201.3 539.1L198.2 538.0L197.7 534.9L195.4 535.5L196.5 537.2L196.2 538.7L198.5 541.0L197.1 543.4L199.0 545.3L201.0 543.9L201.5 542.4L204.6 543.2L206.8 543.0L207.6 545.0L207.3 546.7L214.3 543.6L215.0 541.4L218.3 540.4L218.9 542.4L221.4 542.6L221.5 546.0L223.3 548.0L223.1 549.3L227.5 548.9L226.7 554.1L228.4 555.3L231.4 556.1L228.9 563.0L226.5 563.8L225.6 565.7L224.3 565.7L223.9 568.0L221.8 567.5L220.1 565.8L218.5 566.2L217.4 565.0L215.3 565.5L213.4 570.0L210.4 570.1L210.1 573.6L211.1 574.2L210.7 577.0L207.7 579.9L208.4 580.9L210.6 580.7L213.5 581.9L214.1 582.9L212.0 586.6L208.1 586.8L206.7 590.8L203.8 589.9L200.0 590.7L197.9 589.7L195.7 590.2L194.1 593.4L194.4 594.8L188.2 594.2L187.2 592.3L185.2 593.0L185.1 591.0L183.1 591.2L180.7 588.7L178.7 588.7L178.7 585.9L176.4 587.1Z","Goa":"M139.6 507.4L140.6 507.9L140.6 509.9L139.2 510.8L140.4 512.1L139.5 514.1L140.0 515.4L138.0 518.1L135.5 518.7L133.3 515.1L131.2 508.2L132.3 506.4L128.7 505.0L127.0 499.6L132.4 499.3L133.5 502.3L138.7 501.0L139.6 504.4L139.0 505.1L139.6 507.4Z","Kerala":"M195.5 625.7L197.2 626.5L201.5 623.3L203.7 626.2L202.2 634.4L202.9 636.2L201.2 640.5L203.4 641.4L204.4 640.7L206.2 642.5L203.6 647.7L203.3 651.0L200.8 654.3L203.1 657.3L201.2 660.5L203.4 664.3L203.2 665.9L199.7 670.9L188.0 656.8L183.1 643.4L182.3 636.4L179.9 627.4L180.9 627.1L179.8 627.3L174.4 613.3L172.6 605.7L169.9 598.7L168.2 597.5L166.8 592.3L162.6 588.7L160.4 585.3L159.3 585.3L152.2 568.0L157.4 569.8L161.0 573.4L163.9 574.0L162.8 576.0L164.0 576.9L163.8 578.8L165.3 578.8L167.3 581.9L171.9 584.2L173.5 586.6L176.4 587.1L178.7 585.9L178.7 588.7L180.7 588.7L183.1 591.2L185.1 591.0L185.2 593.0L184.4 594.7L181.3 596.4L188.0 600.2L187.4 602.3L185.7 603.9L189.7 604.0L191.4 603.0L191.1 604.7L192.4 606.7L190.3 609.9L194.0 611.5L195.6 613.5L194.2 617.8L193.7 621.8L194.1 623.7L195.5 625.7ZM166.5 591.5L166.4 591.9L166.8 591.9L166.5 591.5Z","Telangana":"M203.7 483.9L202.8 482.5L206.5 481.4L207.3 479.2L206.7 476.8L207.8 475.2L207.4 473.0L208.2 469.4L207.5 467.8L205.4 466.7L205.7 465.2L208.5 460.4L212.2 458.6L207.1 456.9L207.3 454.3L211.6 448.0L209.3 446.0L210.4 445.2L209.6 442.8L210.4 441.0L209.4 440.6L208.8 438.7L210.1 437.0L210.3 434.7L213.4 434.5L213.2 432.0L214.4 431.6L215.5 428.8L217.8 427.9L215.6 426.4L214.6 422.6L215.9 420.1L216.0 417.3L217.7 416.4L219.8 418.0L222.6 418.8L223.4 414.4L225.5 413.2L224.8 408.3L226.2 407.8L226.7 406.3L225.4 403.3L227.0 404.0L228.1 405.5L231.2 405.4L236.9 406.7L237.2 408.4L239.3 409.2L238.9 411.6L242.3 412.0L244.3 413.7L245.6 410.6L248.0 411.0L250.3 412.7L256.1 410.2L260.3 413.4L261.1 415.1L260.0 420.6L258.5 421.9L260.2 423.5L260.7 427.4L259.7 428.3L264.1 431.6L267.4 430.7L269.5 433.2L271.2 432.8L275.1 435.3L276.6 437.2L277.6 443.4L279.7 442.6L280.0 444.1L282.4 443.5L282.2 446.2L283.2 452.0L284.6 452.0L284.1 453.5L282.3 452.4L280.4 453.4L280.9 455.6L283.3 458.4L289.4 460.9L288.7 463.0L286.9 462.9L286.5 465.0L282.7 465.9L281.6 465.3L280.3 466.6L280.2 468.7L279.5 469.4L273.9 466.8L269.3 470.9L272.9 471.2L274.4 472.2L273.7 475.7L268.4 473.1L268.1 470.9L265.5 469.9L262.7 471.0L262.7 476.2L260.4 478.7L257.1 476.7L249.8 479.1L249.1 480.0L245.7 480.3L244.9 481.6L244.8 488.2L243.6 488.5L240.9 487.8L238.2 489.1L238.6 490.5L234.7 493.2L231.7 491.4L230.7 492.4L227.7 491.6L224.4 493.2L222.6 496.6L220.7 497.0L216.5 495.5L214.7 496.3L211.7 496.0L208.6 495.0L208.3 488.3L210.3 485.5L203.7 483.9Z","West Bengal":"M434.7 362.7L432.7 362.4L434.2 358.8L435.5 359.3L435.6 361.2L434.7 362.7ZM436.0 352.8L433.4 354.8L431.0 359.1L427.5 362.1L421.0 364.1L420.1 360.5L416.7 359.7L416.0 358.5L415.9 356.0L413.0 356.9L412.8 358.3L410.7 357.2L411.3 354.3L409.9 353.2L407.2 352.9L404.9 350.2L407.1 347.7L407.4 346.0L405.7 345.4L406.4 344.0L405.7 341.9L403.4 341.9L403.1 340.1L398.3 337.0L398.7 333.9L400.1 332.3L394.5 332.2L390.3 328.8L386.9 328.3L385.5 326.0L386.9 324.1L386.4 322.3L386.9 321.0L390.2 320.7L391.1 319.1L392.8 319.3L393.1 321.3L396.0 322.7L397.2 319.9L399.7 317.5L406.4 316.1L407.0 314.5L406.4 313.0L408.9 311.9L412.5 313.5L413.4 312.5L415.7 312.5L417.0 311.4L415.7 308.6L417.8 308.3L420.1 309.5L424.1 305.4L424.3 303.3L425.7 303.1L427.7 300.3L427.6 295.7L429.6 296.1L430.0 292.5L428.6 292.0L431.1 287.9L431.0 286.7L427.6 284.1L427.3 280.4L425.8 280.2L426.9 280.0L428.1 280.5L428.7 279.2L427.4 278.3L427.0 276.5L429.1 274.7L431.1 273.7L433.4 275.0L432.4 272.4L433.1 270.0L431.3 269.4L429.7 266.2L428.3 265.6L428.2 264.6L428.8 262.2L437.9 255.5L437.1 252.5L434.3 250.5L436.0 245.3L434.6 241.2L431.8 237.6L432.8 235.0L434.0 237.0L435.3 237.5L438.0 237.0L441.0 238.4L443.3 236.0L444.7 235.7L450.4 237.6L450.5 240.8L451.6 240.2L455.2 242.6L456.0 244.5L458.7 244.5L461.3 243.4L463.0 244.7L465.0 244.4L469.5 247.0L471.4 247.0L471.8 248.9L471.2 254.3L469.9 255.0L468.2 258.1L468.8 259.1L466.8 257.8L466.3 259.6L467.1 261.6L464.8 262.9L460.7 262.8L458.2 260.2L456.6 259.9L455.3 254.1L452.9 252.8L451.4 254.3L453.0 255.0L451.7 256.5L448.2 255.5L440.9 250.1L440.5 248.3L439.1 251.6L442.3 252.5L443.0 254.7L440.6 255.5L439.5 258.0L435.8 259.6L434.0 264.7L434.1 267.0L435.0 267.8L437.7 268.1L441.7 270.8L441.5 272.4L445.8 275.1L449.3 274.1L449.9 277.7L453.0 279.8L451.4 282.0L441.3 281.5L441.6 284.3L440.4 286.8L437.9 288.6L436.8 287.0L435.0 288.1L435.7 289.3L433.4 291.4L432.6 293.2L434.8 297.4L439.1 298.9L443.9 302.0L446.5 301.7L447.8 303.3L447.9 305.7L446.9 306.9L447.8 308.3L447.6 311.2L444.9 312.3L444.0 315.7L444.6 318.0L448.2 321.9L447.1 326.8L449.3 326.3L452.1 327.4L450.3 332.9L452.6 335.8L451.4 337.7L452.5 339.2L451.7 340.2L453.3 345.3L453.2 348.6L454.7 350.4L454.8 356.4L453.5 357.4L451.9 356.5L450.2 357.0L448.2 356.2L448.2 354.8L445.5 356.2L443.3 358.6L441.5 357.1L440.3 357.6L439.6 359.7L437.7 361.5L438.4 362.8L437.5 365.4L435.1 356.2L436.4 354.6L436.6 352.8L435.9 350.9L433.7 349.2L431.9 349.6L432.3 350.5L434.9 350.9L436.0 352.8ZM454.1 364.2L453.6 360.3L455.3 363.2L454.1 364.2ZM448.5 358.2L449.2 362.8L447.9 363.0L446.7 360.9L447.2 357.4L448.5 358.2ZM452.2 360.5L449.5 356.9L450.8 357.2L452.1 357.2L452.2 360.5Z","Dadra and Nagar Haveli and Daman and Diu":"M113.3 393.8L115.9 394.6L115.3 396.7L116.9 398.5L115.3 399.3L111.6 398.3L111.0 394.4L113.3 393.8ZM110.0 390.6L108.7 392.8L108.9 390.8L110.0 390.6ZM68.1 384.2L69.8 384.2L69.3 385.1L68.1 384.2Z","Puducherry":"M258.3 612.5L257.7 611.3L255.7 610.1L256.2 608.6L258.4 608.8L258.3 612.5ZM166.8 591.9L166.4 591.9L166.5 591.5L166.8 591.9ZM257.4 589.0L254.8 588.2L257.0 586.4L258.1 586.5L257.4 589.0ZM309.8 477.4L308.4 476.8L308.1 476.4L309.9 476.7L309.8 477.4Z","Lakshadweep":"M113.3 671.5L112.8 671.2L113.5 671.3L113.3 671.5Z","Arunachal Pradesh":"M531.6 239.3L529.2 241.0L519.6 242.5L519.4 239.9L517.9 238.6L517.7 236.3L518.7 233.7L517.5 228.8L515.9 229.4L509.9 228.9L507.9 226.6L507.8 225.5L509.2 223.8L509.3 221.6L513.5 221.4L514.7 223.4L516.9 222.3L518.4 222.6L520.6 220.8L522.7 220.2L523.8 222.1L529.2 221.2L532.9 217.6L531.3 215.5L531.9 214.1L534.3 212.4L536.3 212.3L539.0 210.0L543.3 209.2L542.4 207.1L544.5 205.4L545.8 202.3L549.0 201.3L551.8 201.9L559.0 200.6L559.8 197.7L563.2 195.0L563.8 193.1L566.0 190.6L567.5 190.5L569.1 188.8L571.8 188.7L572.2 187.5L574.3 186.5L578.4 189.8L586.5 191.5L586.9 192.9L590.8 193.2L592.6 189.1L599.9 185.0L601.5 185.2L604.3 183.4L607.6 188.6L610.8 188.2L609.8 190.1L607.1 190.9L605.6 192.9L607.7 195.4L609.8 193.3L611.7 193.2L613.5 194.7L613.9 196.7L615.4 198.7L614.9 200.5L612.5 201.3L612.9 202.4L609.4 205.3L610.4 205.9L609.1 208.2L616.6 206.4L619.1 208.6L621.5 208.3L623.6 209.9L625.6 208.7L627.4 210.3L631.6 212.0L630.7 213.5L630.7 215.7L632.0 216.9L631.7 219.1L629.1 219.3L624.4 222.8L621.7 225.9L620.8 225.5L622.4 228.3L621.7 229.6L627.2 236.8L625.1 237.9L623.4 236.5L620.8 235.7L621.3 234.1L619.4 232.1L615.4 231.6L613.3 233.2L609.0 233.3L604.3 234.9L602.9 235.9L601.3 238.9L598.2 239.7L597.0 242.5L595.7 242.3L594.1 244.4L591.7 244.3L590.2 247.0L587.6 248.1L586.1 247.4L585.4 243.6L586.0 241.8L585.3 239.3L586.6 239.4L590.7 237.0L591.4 234.5L592.5 234.0L594.6 234.7L599.4 233.8L602.8 231.6L601.2 230.0L599.9 230.0L599.7 227.5L597.8 225.7L597.6 223.2L601.8 218.0L598.6 217.7L594.0 218.1L592.1 219.8L589.2 220.7L587.7 220.1L584.0 221.3L578.0 223.3L569.7 227.3L564.9 225.5L564.4 226.1L565.5 228.1L559.6 232.5L555.7 236.6L556.2 238.5L552.7 240.8L539.0 242.0L536.1 240.1L531.6 239.3Z","Assam":"M528.6 305.0L526.5 305.6L526.2 303.4L523.5 303.5L521.9 302.5L522.8 300.9L521.8 297.4L523.5 292.2L522.2 288.4L523.6 288.0L525.4 289.5L528.2 288.9L526.3 285.4L527.4 283.6L530.4 283.5L534.1 279.6L531.1 276.1L529.3 275.4L531.3 272.9L529.7 273.4L526.7 269.5L522.0 269.6L520.4 270.6L520.4 267.3L521.5 265.2L520.7 263.8L523.0 261.6L514.4 262.1L513.5 260.3L511.3 262.3L511.3 263.9L508.3 262.3L505.4 266.8L503.0 266.7L500.6 269.5L499.0 266.5L496.1 267.1L496.5 265.7L494.8 264.3L489.9 264.1L488.1 264.9L483.9 263.3L478.6 264.4L477.2 264.0L472.4 269.4L475.0 272.1L472.0 273.5L471.4 275.4L472.1 271.9L470.9 269.2L471.2 265.8L472.2 264.3L468.2 258.1L469.9 255.0L471.2 254.3L471.6 246.2L475.6 246.3L478.7 245.3L479.5 243.3L481.8 243.2L483.5 242.2L486.2 244.3L489.9 245.4L497.0 245.1L498.0 244.1L503.1 245.1L504.6 243.7L506.5 244.9L510.9 244.4L514.9 241.9L518.4 243.6L519.6 242.5L529.2 241.0L531.6 239.3L536.1 240.1L539.0 242.0L552.7 240.8L556.2 238.5L555.7 236.6L559.6 232.5L565.5 228.1L564.4 226.1L564.9 225.5L569.7 227.3L578.0 223.3L584.0 221.3L587.7 220.1L589.2 220.7L592.1 219.8L594.0 218.1L601.8 218.0L597.6 223.2L597.8 225.7L599.7 227.5L599.9 230.0L601.2 230.0L602.8 231.6L599.4 233.8L594.6 234.7L592.5 234.0L591.4 234.5L590.7 237.0L580.7 242.0L579.5 241.2L575.5 245.8L572.3 246.4L568.4 249.0L568.4 250.8L566.5 252.5L565.9 250.2L563.7 252.6L563.3 255.0L562.0 255.7L559.8 259.1L558.9 263.8L559.4 265.0L557.3 266.7L555.1 266.5L555.0 263.8L553.0 265.3L553.5 266.5L545.5 273.6L548.2 276.1L548.5 279.1L546.6 280.6L542.2 290.8L540.8 290.5L540.4 296.0L539.6 296.6L538.7 299.6L536.3 300.1L534.3 299.5L533.4 297.3L531.9 301.0L530.5 301.5L530.2 303.2L528.9 303.4L528.6 305.0Z","Nagaland":"M545.5 273.6L549.4 270.6L550.1 269.3L553.5 266.5L553.0 265.3L555.0 263.8L555.1 266.5L557.3 266.7L559.4 265.0L558.9 263.8L559.8 259.1L562.0 255.7L563.3 255.0L563.7 252.6L565.9 250.2L566.5 252.5L568.4 250.8L568.4 249.0L572.3 246.4L575.5 245.8L579.5 241.2L580.7 242.0L585.3 239.3L586.0 241.8L585.4 243.6L586.1 247.4L582.4 252.7L583.7 255.1L583.6 260.6L585.1 261.4L581.4 265.6L582.0 269.0L579.8 270.7L577.0 274.7L574.2 275.9L571.6 274.5L571.6 272.8L570.2 272.2L568.7 273.8L566.7 274.5L564.3 274.7L563.9 273.5L562.1 274.1L560.0 273.0L554.8 273.7L555.7 275.4L551.4 281.5L549.2 280.5L548.2 276.1L545.5 273.6Z","Meghalaya":"M501.3 281.6L497.6 281.5L492.8 282.4L491.2 281.9L485.5 282.2L484.1 282.8L481.7 281.7L477.0 281.0L474.0 279.2L471.1 279.3L470.7 277.2L471.9 275.1L472.0 273.5L475.0 272.1L472.4 269.4L477.2 264.0L478.6 264.4L483.9 263.3L488.1 264.9L489.9 264.1L494.8 264.3L496.5 265.7L496.1 267.1L499.0 266.5L500.6 269.5L503.0 266.7L505.4 266.8L508.3 262.3L511.3 263.9L511.3 262.3L513.5 260.3L514.4 262.1L523.0 261.6L520.7 263.8L521.5 265.2L520.4 267.3L520.4 270.6L522.0 269.6L526.7 269.5L529.7 273.4L531.3 272.9L529.3 275.4L531.1 276.1L534.1 279.6L530.4 283.5L527.4 283.6L526.3 285.4L518.9 281.9L511.8 282.2L509.6 283.2L508.7 282.1L506.4 283.0L504.0 282.0L503.5 280.7L501.3 281.6Z","Manipur":"M549.3 310.5L546.6 307.1L543.9 308.7L538.0 306.5L539.0 303.7L538.7 299.6L539.6 296.6L540.4 296.0L540.8 290.5L542.2 290.8L546.6 280.6L548.5 279.1L549.2 280.5L551.4 281.5L555.7 275.4L554.8 273.7L560.0 273.0L562.1 274.1L563.9 273.5L564.3 274.7L568.7 273.8L570.2 272.2L571.6 272.8L571.6 274.5L574.2 275.9L572.1 281.2L573.7 283.5L575.5 283.5L575.7 285.3L574.5 288.6L573.3 289.8L573.2 291.7L571.4 292.8L571.2 294.3L567.8 297.8L568.5 299.1L566.0 303.8L563.2 312.6L560.2 310.8L557.6 310.2L555.7 310.8L554.3 309.0L551.8 308.9L549.3 310.5Z","Tripura":"M512.1 326.0L513.3 328.8L513.1 330.7L511.3 332.5L508.2 333.0L507.5 332.2L506.7 327.9L505.6 326.2L502.7 325.8L501.3 321.0L499.3 318.5L499.2 315.1L500.7 315.3L501.2 313.1L500.6 311.9L502.3 309.2L509.3 306.8L509.9 304.9L512.0 305.9L511.8 303.5L515.6 306.6L515.6 301.3L516.6 300.3L518.7 300.5L520.2 299.3L520.5 297.0L521.8 297.4L522.8 300.9L521.9 302.5L523.5 303.5L524.3 304.9L524.1 311.1L522.7 313.4L522.9 315.4L521.0 315.9L519.8 315.3L518.5 317.4L515.9 316.3L516.7 321.1L516.0 322.3L514.3 321.9L513.0 320.3L513.8 323.6L512.1 326.0Z","Andaman and Nicobar Islands":"M534.1 649.1L534.8 651.3L532.7 651.6L532.6 649.5L534.1 649.1ZM526.4 618.8L525.3 613.5L528.3 610.9L529.7 613.4L529.9 615.8L528.5 619.5L526.4 618.8ZM530.8 596.7L531.9 599.9L530.0 600.5L529.7 599.3L530.8 596.7ZM532.3 586.1L534.1 588.1L533.3 592.3L531.3 593.4L533.2 594.5L531.4 596.9L528.9 591.9L528.6 587.5L530.0 589.0L531.3 580.5L533.3 581.4L532.9 583.5L533.9 584.4L532.3 586.1ZM555.6 706.0L553.8 700.8L552.7 700.1L552.3 697.7L552.9 696.2L556.3 695.1L557.0 695.9L558.0 701.8L557.2 705.4L555.6 706.0ZM551.5 693.4L553.4 690.4L554.4 691.9L553.7 693.4L552.1 695.0L551.5 693.4ZM534.5 578.3L534.9 578.5L535.8 578.5L535.4 581.8L533.6 581.3L533.0 579.8L534.5 578.3ZM532.5 578.6L532.1 577.9L533.1 568.8L532.8 566.2L534.1 565.6L534.0 562.0L534.7 559.9L535.1 553.4L535.8 551.6L537.1 551.0L538.3 549.2L539.4 550.3L539.2 554.5L539.9 556.2L539.2 560.6L537.6 562.1L536.6 561.2L535.5 564.7L536.9 565.1L537.8 568.4L538.0 573.0L535.8 577.8L532.5 578.6Z","Uttar Pradesh":"M234.9 295.3L237.7 294.4L239.2 296.5L238.4 298.6L240.0 299.5L239.6 301.1L236.1 305.0L229.6 300.1L227.2 303.1L225.9 301.6L226.8 300.5L224.6 298.8L224.8 293.9L222.6 289.0L226.3 285.8L226.1 284.2L228.4 283.3L226.3 278.5L226.2 276.1L227.3 275.9L228.5 272.9L232.9 273.2L234.2 272.2L236.2 271.8L235.2 269.5L238.9 264.2L239.1 262.4L240.5 261.2L240.1 258.5L243.2 255.3L243.1 252.9L240.0 249.7L240.4 247.6L237.5 247.0L235.5 245.4L230.5 245.5L227.3 244.3L226.6 243.1L223.7 243.9L224.7 241.9L222.1 241.2L221.3 242.5L218.6 242.6L213.8 241.6L213.0 242.9L208.8 244.2L207.3 246.0L206.1 243.9L211.7 240.7L209.4 237.5L211.6 236.1L211.4 234.5L204.9 227.9L205.1 225.0L203.7 221.7L208.9 218.7L209.2 217.3L207.8 215.1L208.4 208.5L203.9 204.0L204.9 203.0L204.0 200.7L202.1 198.8L202.6 195.9L201.2 193.2L200.7 190.2L200.9 187.2L199.9 179.4L200.8 178.2L200.2 176.6L201.3 175.5L202.4 172.4L210.0 163.9L209.9 161.7L211.6 161.7L213.0 163.4L218.1 165.4L215.9 168.3L214.7 168.8L212.9 173.6L215.1 178.5L217.4 177.6L219.4 180.6L223.3 177.0L226.1 175.6L229.8 177.3L230.3 179.3L232.1 181.1L236.0 183.3L238.6 183.9L235.1 187.9L237.6 189.3L238.7 191.3L241.0 190.1L243.5 191.3L243.3 192.4L245.7 194.2L248.9 195.1L249.2 196.4L252.7 197.5L257.7 196.6L260.6 200.4L262.2 199.8L262.9 197.8L264.1 198.0L267.4 200.6L268.2 202.5L271.3 202.6L273.3 201.1L275.8 202.2L276.8 203.9L287.4 208.8L287.8 210.4L289.7 212.5L291.9 213.1L293.0 215.1L301.7 220.3L303.3 218.8L305.6 218.8L306.7 220.1L308.6 220.6L313.7 224.4L318.3 223.4L319.2 223.8L320.2 226.5L319.7 228.8L323.9 228.5L326.2 229.7L329.5 229.6L331.7 232.3L332.8 232.3L334.2 230.5L333.9 229.0L338.5 229.3L343.2 231.5L346.6 236.0L346.0 238.1L347.8 239.0L348.1 242.6L352.3 244.5L353.8 247.3L355.7 248.5L352.7 249.3L349.2 248.6L347.9 250.4L345.0 251.5L344.8 252.8L350.1 254.4L350.5 257.0L348.6 258.0L348.0 260.8L353.1 264.3L354.3 264.0L360.1 267.9L359.6 269.2L358.6 270.4L353.9 269.0L353.6 270.7L351.1 270.7L349.7 269.3L348.3 270.1L348.5 271.5L345.3 273.3L343.5 276.1L336.9 279.0L332.9 281.9L333.9 291.1L335.9 292.2L336.7 294.3L336.6 296.5L334.0 297.7L333.6 301.9L334.2 303.0L332.5 306.8L329.9 310.9L327.4 312.1L324.3 312.1L321.5 310.0L318.3 306.2L320.0 305.3L320.6 300.6L319.3 300.4L321.1 295.9L320.6 294.3L319.2 294.5L318.4 293.1L313.1 294.1L313.1 295.5L310.5 295.2L308.8 290.9L302.9 289.7L301.9 286.4L297.1 284.7L296.2 282.4L294.4 281.8L293.5 282.7L291.2 283.1L288.8 282.3L288.5 284.9L286.2 288.1L285.4 288.3L281.7 286.9L279.9 287.8L279.2 285.4L280.3 284.6L279.5 281.8L277.0 283.4L276.8 284.6L274.2 284.0L272.2 285.2L271.7 286.7L270.1 284.5L268.8 285.8L267.2 285.5L270.7 282.1L270.2 280.5L268.2 279.5L268.3 277.2L266.2 277.0L262.2 278.2L258.5 281.7L258.1 283.8L256.2 282.9L254.6 283.3L252.4 282.2L250.7 284.3L248.9 283.6L248.5 282.2L249.5 280.3L247.7 278.5L246.2 278.6L245.8 279.8L247.1 282.7L243.0 283.6L241.6 281.0L238.7 281.3L237.7 282.5L239.4 278.2L237.7 277.2L239.0 274.8L237.8 274.2L234.5 275.6L235.4 278.0L233.0 277.3L229.8 279.8L232.6 284.5L232.4 287.1L233.3 288.5L235.3 289.3L235.5 292.9L234.9 295.3Z","Rajasthan":"M144.5 330.2L141.9 329.6L140.5 330.8L139.0 327.9L136.4 328.1L136.7 326.0L133.3 324.4L132.8 323.4L131.4 324.5L130.1 322.4L128.5 321.7L125.7 321.8L126.4 317.9L124.6 317.1L123.5 318.2L120.2 313.4L120.4 311.3L121.3 310.9L121.0 308.2L119.1 307.9L117.6 309.1L117.0 307.4L113.8 304.7L115.6 301.0L114.0 300.0L114.2 297.7L112.4 298.1L111.5 300.8L106.6 300.7L105.6 298.5L102.2 297.6L101.7 299.5L98.6 296.2L98.2 294.6L94.6 294.8L92.3 292.7L83.8 294.4L82.7 293.6L80.0 293.5L75.9 294.9L72.2 293.6L68.4 287.5L67.4 282.7L62.6 277.0L62.8 270.5L61.4 269.7L56.7 270.6L54.2 269.7L50.6 264.5L50.3 261.2L52.2 257.3L52.2 250.4L49.7 249.3L44.0 249.3L38.0 246.0L37.5 244.5L38.1 239.8L39.7 235.8L49.0 227.1L51.3 221.5L56.4 216.8L59.3 216.2L61.0 216.8L62.9 218.8L63.0 221.0L64.6 223.4L67.8 223.7L74.1 220.8L77.9 219.9L84.0 219.8L88.4 218.1L88.5 219.0L89.6 214.2L95.5 208.0L97.5 201.6L99.7 199.0L111.2 193.4L118.4 180.8L120.9 172.2L129.6 169.4L133.0 166.5L133.2 168.2L131.6 169.8L131.5 171.6L144.9 172.3L145.7 174.0L144.0 175.2L143.9 176.8L146.8 176.7L145.9 181.0L147.0 181.8L146.1 183.4L146.5 185.6L150.5 185.7L151.8 184.7L153.7 185.7L154.2 187.5L156.1 187.4L156.7 188.7L162.4 187.5L163.6 188.0L163.3 192.6L164.4 192.7L166.2 194.7L165.1 195.7L167.0 202.9L168.3 203.2L169.3 205.1L174.0 208.0L177.5 211.9L176.3 214.2L175.7 218.6L174.9 218.7L175.7 220.4L180.1 221.7L181.1 220.9L179.9 219.3L179.7 217.1L181.9 215.5L183.1 216.7L184.0 214.2L183.0 212.9L187.9 216.2L187.8 217.6L190.6 216.7L190.9 215.0L193.3 213.6L194.5 211.9L197.0 213.8L196.1 217.2L196.4 220.6L195.3 223.2L197.1 225.0L198.6 221.2L203.7 221.7L205.1 225.0L204.9 227.9L211.4 234.5L211.6 236.1L209.4 237.5L211.7 240.7L206.1 243.9L207.3 246.0L208.8 244.2L213.0 242.9L213.8 241.6L218.6 242.6L221.3 242.5L222.1 241.2L224.7 241.9L223.7 243.9L221.3 244.8L220.8 247.5L218.9 247.1L216.9 247.9L215.2 250.4L213.5 250.7L209.1 253.6L206.9 253.8L203.4 256.9L195.5 260.9L193.1 264.4L191.6 265.3L190.0 265.2L187.9 266.8L187.0 270.7L187.3 274.0L190.6 278.1L192.5 278.7L194.6 278.5L196.5 279.6L199.4 278.4L202.4 278.8L202.6 277.4L204.3 276.2L205.4 276.6L206.4 281.0L206.0 283.4L204.3 284.2L203.4 283.5L201.3 283.6L199.4 284.8L197.6 284.4L195.0 285.2L194.7 287.0L196.5 289.1L193.5 290.5L194.5 292.0L196.5 291.7L198.3 292.8L199.1 296.3L197.1 298.5L194.7 296.5L193.7 296.8L194.0 300.9L196.0 304.3L195.1 306.1L193.4 306.4L190.7 304.7L190.0 302.9L188.5 304.3L183.2 303.5L178.8 304.7L179.0 307.1L177.2 307.6L175.0 311.5L171.9 312.2L169.7 315.0L167.4 313.8L167.0 312.5L164.8 311.0L166.1 308.6L170.0 309.9L172.8 307.8L171.0 305.8L172.3 303.5L170.5 300.0L171.8 298.7L174.2 298.9L174.6 296.6L171.7 291.6L168.0 293.4L166.7 293.0L164.7 293.5L158.9 291.9L162.2 287.2L162.5 285.7L159.1 285.3L157.4 286.9L157.5 288.9L155.8 289.7L154.1 289.4L152.9 287.7L151.3 288.4L152.0 290.7L154.5 291.5L154.8 293.2L152.6 294.5L150.8 292.2L150.2 293.9L150.4 295.6L148.6 298.0L151.1 298.3L151.9 299.4L150.3 301.3L149.8 303.6L152.2 303.5L153.1 304.3L152.4 305.1L154.5 308.2L152.9 312.0L153.7 314.5L153.3 316.8L151.7 319.5L150.2 319.7L145.9 322.5L145.0 324.8L149.3 327.1L144.5 330.2Z","Delhi":"M204.0 200.7L204.9 203.0L203.9 204.0L205.0 205.0L203.0 205.9L201.3 207.7L199.7 205.3L197.8 204.6L195.1 205.5L194.3 204.3L195.2 202.5L197.0 201.0L196.4 198.6L196.9 198.3L200.2 197.3L202.2 197.4L202.1 198.8L204.0 200.7Z","Haryana":"M177.5 211.9L174.0 208.0L169.3 205.1L168.3 203.2L167.0 202.9L165.1 195.7L166.2 194.7L164.4 192.7L163.3 192.6L163.6 188.0L162.4 187.5L156.7 188.7L156.1 187.4L154.2 187.5L153.7 185.7L151.8 184.7L150.5 185.7L146.5 185.6L146.1 183.4L147.0 181.8L145.9 181.0L146.8 176.7L143.9 176.8L144.0 175.2L145.7 174.0L144.9 172.3L147.5 173.0L148.7 171.5L151.0 171.1L153.4 172.1L154.9 174.0L157.5 174.8L159.1 174.6L160.2 176.7L158.6 178.6L161.5 181.1L162.4 178.0L164.8 175.4L167.4 177.0L171.6 175.1L175.2 177.2L177.4 176.8L178.4 175.3L180.9 174.6L180.0 172.7L181.7 168.9L185.0 167.6L186.3 168.7L188.6 168.6L190.0 167.5L188.3 165.4L191.5 163.5L192.2 161.1L195.7 161.2L196.0 156.9L193.9 155.3L194.3 151.8L192.9 150.1L194.8 150.9L195.8 150.2L198.1 153.7L201.2 155.2L201.3 157.1L200.2 158.0L202.1 159.7L206.3 161.1L208.8 160.7L210.0 162.2L210.0 163.9L202.4 172.4L201.3 175.5L200.2 176.6L200.8 178.2L199.9 179.4L200.9 187.2L200.7 190.2L201.2 193.2L202.6 195.9L202.2 197.4L200.2 197.3L196.4 198.6L197.0 201.0L195.2 202.5L194.3 204.3L195.1 205.5L197.8 204.6L199.7 205.3L201.3 207.7L203.0 205.9L205.0 205.0L208.4 208.5L207.8 215.1L209.2 217.3L208.9 218.7L203.7 221.7L198.6 221.2L197.1 225.0L195.3 223.2L196.4 220.6L196.1 217.2L197.0 213.8L194.5 211.9L193.3 213.6L190.9 215.0L190.6 216.7L187.8 217.6L187.9 216.2L183.0 212.9L184.0 214.2L183.1 216.7L181.9 215.5L179.7 217.1L179.9 219.3L181.1 220.9L180.1 221.7L175.7 220.4L174.9 218.7L175.7 218.6L176.3 214.2L177.5 211.9Z","Sikkim":"M451.6 232.7L451.2 233.8L449.1 234.4L448.9 235.8L447.4 236.9L444.7 235.7L443.3 236.0L441.0 238.4L438.0 237.0L435.3 237.5L434.0 237.0L432.8 235.0L432.9 229.0L436.2 221.9L436.3 218.4L442.0 216.6L445.2 214.8L448.1 215.3L450.0 217.2L449.8 218.7L450.9 220.3L450.2 221.2L450.1 224.7L448.3 227.0L448.9 230.5L451.6 232.7Z","Bihar":"M368.7 299.6L366.0 300.6L365.7 298.5L363.9 296.9L359.2 299.9L357.3 302.5L356.6 301.4L354.0 300.1L353.7 297.9L352.2 297.0L348.7 296.8L346.9 294.3L345.4 296.5L344.0 296.9L340.8 297.5L336.2 297.0L336.7 294.3L335.9 292.2L333.9 291.1L332.9 281.9L336.9 279.0L343.5 276.1L345.3 273.3L348.5 271.5L348.3 270.1L349.7 269.3L351.1 270.7L353.6 270.7L353.9 269.0L358.6 270.4L360.1 267.9L354.3 264.0L353.1 264.3L348.0 260.8L348.6 258.0L350.5 257.0L350.1 254.4L344.8 252.8L345.0 251.5L347.9 250.4L349.2 248.6L352.7 249.3L355.7 248.5L353.8 247.3L352.3 244.5L348.1 242.6L347.8 239.0L346.0 238.1L346.6 236.0L343.8 232.3L343.2 230.2L347.1 230.0L348.8 228.1L352.3 229.7L352.7 231.0L360.0 232.2L361.4 235.0L360.4 238.9L362.9 240.0L364.3 239.6L367.2 241.0L368.7 242.9L372.2 243.1L371.9 244.7L373.5 245.7L375.2 246.0L381.8 243.4L383.6 244.5L383.5 247.6L386.4 250.0L388.5 248.1L390.0 247.7L400.9 250.7L401.5 251.6L404.8 253.3L407.4 252.9L411.6 250.2L412.6 252.7L414.1 253.8L418.5 253.7L420.5 252.9L423.2 254.3L428.8 253.0L432.7 254.0L434.1 252.6L434.3 250.5L437.1 252.5L437.9 255.5L428.8 262.2L428.2 264.6L428.3 265.6L429.7 266.2L431.3 269.4L433.1 270.0L432.4 272.4L433.4 275.0L431.1 273.7L427.0 276.5L427.4 278.3L428.7 279.2L428.1 280.5L425.8 280.2L425.4 278.9L422.4 278.5L420.9 281.6L417.6 281.0L417.0 284.1L414.4 284.8L413.8 285.7L414.0 288.8L413.0 289.5L411.8 294.7L409.7 294.6L408.8 296.5L405.4 294.9L403.3 296.0L402.4 295.1L400.0 297.4L399.0 300.6L395.3 298.4L395.8 296.2L392.2 295.2L392.1 293.0L390.5 291.2L387.9 292.1L383.8 290.3L382.3 293.9L382.5 295.5L379.6 296.9L376.0 296.4L375.1 297.4L374.2 297.1L369.9 300.6L368.7 299.6Z","Jharkhand":"M390.1 350.8L389.6 352.5L387.2 355.6L384.8 355.5L384.0 353.5L382.6 353.9L376.5 351.4L373.9 353.3L373.1 355.0L371.9 353.5L368.7 352.4L369.7 349.3L369.6 343.9L367.2 344.9L364.0 344.7L362.7 345.5L358.2 345.3L355.9 347.1L353.0 347.3L351.0 346.5L349.1 344.2L347.0 343.0L347.0 342.0L348.5 340.5L350.0 340.5L351.8 339.3L355.2 333.8L354.7 332.7L350.6 332.6L348.1 329.5L347.6 328.2L348.3 324.5L346.0 323.3L347.1 320.6L347.1 317.6L345.4 319.1L342.0 318.1L340.5 313.3L337.6 312.3L334.7 307.2L332.5 306.8L334.2 303.0L333.6 301.9L334.0 297.7L344.0 296.9L345.4 296.5L346.9 294.3L348.7 296.8L352.2 297.0L353.7 297.9L354.0 300.1L356.6 301.4L357.3 302.5L359.2 299.9L363.9 296.9L365.7 298.5L366.0 300.6L368.7 299.6L369.9 300.6L376.0 296.4L379.6 296.9L382.5 295.5L382.3 293.9L383.8 290.3L387.9 292.1L390.5 291.2L392.1 293.0L392.2 295.2L395.8 296.2L395.3 298.4L399.0 300.6L400.0 297.4L402.4 295.1L403.3 296.0L405.4 294.9L408.8 296.5L409.7 294.6L411.8 294.7L413.0 289.5L414.0 288.8L413.8 285.7L414.4 284.8L417.0 284.1L417.6 281.0L420.9 281.6L422.4 278.5L425.4 278.9L425.8 280.2L427.3 280.4L427.6 284.1L431.0 286.7L431.1 287.9L428.6 292.0L430.0 292.5L429.6 296.1L427.6 295.7L427.7 300.3L425.7 303.1L424.3 303.3L424.1 305.4L420.1 309.5L417.8 308.3L415.7 308.6L417.0 311.4L415.7 312.5L413.4 312.5L412.5 313.5L408.9 311.9L406.4 313.0L407.0 314.5L406.4 316.1L399.7 317.5L397.2 319.9L396.0 322.7L393.1 321.3L392.8 319.3L391.1 319.1L390.2 320.7L386.9 321.0L386.4 322.3L386.9 324.1L385.5 326.0L386.9 328.3L390.3 328.8L394.5 332.2L400.1 332.3L398.7 333.9L398.3 337.0L403.1 340.1L403.4 341.9L405.7 341.9L406.4 344.0L405.7 345.4L407.4 346.0L407.1 347.7L404.9 350.2L400.0 347.2L398.5 347.9L397.0 347.2L395.4 344.9L391.9 344.0L390.8 342.4L388.6 344.0L389.8 345.4L390.0 347.5L388.8 349.5L390.1 350.8Z","Ladakh":"M200.8 102.4L197.8 102.2L196.2 101.2L192.8 96.1L187.0 90.0L182.9 88.7L182.0 84.8L179.9 83.6L176.8 78.9L173.4 79.4L169.6 75.2L163.8 72.3L163.0 69.9L161.8 68.8L162.6 66.7L160.1 64.4L155.4 64.4L153.4 63.6L149.3 63.4L145.7 61.2L140.5 60.7L145.8 58.7L146.2 55.6L144.1 53.3L139.1 55.0L129.3 50.2L128.0 50.8L127.3 47.6L129.3 45.2L129.1 43.7L125.9 42.7L121.1 42.9L115.3 39.3L115.6 36.5L114.3 35.5L110.9 36.4L110.3 35.5L105.8 36.7L102.5 34.7L103.8 32.2L102.4 31.1L103.8 26.8L107.7 25.7L109.9 23.9L109.8 22.6L112.2 22.3L114.8 18.8L115.1 17.0L121.8 15.7L127.3 17.1L129.6 16.3L130.8 14.7L127.8 13.6L127.1 11.8L131.1 12.2L134.9 14.2L136.7 13.5L137.3 12.0L139.2 12.4L142.8 10.0L145.0 10.1L146.2 8.8L148.8 8.0L149.3 9.3L151.6 9.3L153.3 12.0L155.4 10.3L157.0 11.1L159.4 8.9L162.3 8.6L162.5 10.2L164.0 10.7L165.1 14.1L168.1 15.3L170.9 19.3L174.7 21.2L177.9 21.9L181.7 24.8L183.8 24.5L185.5 25.7L186.5 27.9L189.1 29.0L190.0 28.6L191.6 30.9L193.4 31.7L191.7 33.9L193.6 36.4L196.2 37.8L200.1 37.5L201.1 38.9L206.8 40.8L207.5 42.6L206.9 43.9L210.7 45.0L215.0 44.0L216.8 45.1L218.2 42.7L219.8 42.3L221.8 43.4L223.1 40.4L224.7 39.2L227.1 38.9L227.9 37.8L230.0 38.3L233.1 36.1L236.4 36.1L239.4 35.3L240.7 36.3L243.0 36.6L244.3 35.4L244.8 33.3L248.3 32.9L249.2 35.2L258.7 37.8L261.5 36.6L263.8 40.2L267.7 41.8L268.5 45.0L265.4 52.0L265.2 55.8L263.0 59.8L263.0 62.4L258.5 63.0L256.7 64.4L257.1 67.7L252.8 67.3L251.0 67.9L252.8 72.4L251.0 74.1L250.7 75.7L247.8 78.0L240.7 77.7L238.2 79.4L242.5 87.7L240.0 87.8L238.4 88.7L238.8 91.9L240.0 94.2L242.6 95.2L249.9 95.9L248.2 99.9L249.2 102.8L253.6 107.9L249.8 112.7L247.0 111.3L244.3 113.8L243.1 113.9L242.7 116.1L240.9 116.0L239.8 117.1L237.2 114.8L235.5 112.1L235.1 109.8L233.0 109.8L228.7 111.6L227.4 112.8L225.6 111.7L227.6 110.6L227.2 107.5L223.6 109.6L222.0 109.2L221.0 110.4L219.3 110.6L217.2 109.0L217.5 108.2L213.4 102.6L210.5 103.2L207.6 105.2L206.3 104.6L204.8 106.1L200.8 102.4Z","Jammu and Kashmir":"M152.2 113.7L148.2 113.6L147.3 110.8L147.7 106.8L144.6 107.8L143.2 106.7L141.8 107.5L137.5 104.6L135.0 104.0L132.8 102.2L125.7 99.8L126.4 97.1L124.4 94.0L125.6 88.7L124.3 87.6L125.1 85.5L124.3 84.0L124.9 81.5L123.5 79.2L122.9 73.8L120.7 70.2L121.9 65.6L125.6 65.4L128.4 60.7L132.9 59.5L135.3 57.2L135.1 54.7L136.8 53.6L139.1 55.0L144.1 53.3L146.2 55.6L145.8 58.7L140.5 60.7L145.7 61.2L149.3 63.4L153.4 63.6L155.4 64.4L160.1 64.4L162.6 66.7L161.8 68.8L163.0 69.9L163.8 72.3L169.6 75.2L173.4 79.4L176.8 78.9L179.9 83.6L182.0 84.8L182.9 88.7L187.0 90.0L192.8 96.1L192.2 97.8L190.1 98.2L188.4 97.1L185.0 97.6L181.0 101.4L178.7 101.7L178.2 102.9L175.3 104.8L173.1 103.5L172.1 104.5L174.7 107.7L174.6 110.3L172.8 113.1L170.5 114.5L169.6 115.9L167.7 116.2L165.9 117.8L162.3 116.9L157.3 114.3L153.9 114.6L152.6 112.9L152.2 113.7Z","Himachal Pradesh":"M195.8 150.2L194.8 150.9L189.6 148.0L190.1 143.1L188.8 141.6L186.9 141.7L184.7 138.4L182.5 140.9L180.6 141.0L178.9 136.5L176.7 133.4L174.4 126.1L167.7 123.0L169.1 121.7L168.6 119.1L171.4 118.3L173.6 115.8L174.8 115.8L172.8 113.1L174.6 110.3L174.7 107.7L172.1 104.5L173.1 103.5L175.3 104.8L178.2 102.9L178.7 101.7L181.0 101.4L185.0 97.6L188.4 97.1L190.1 98.2L192.2 97.8L192.8 96.1L196.2 101.2L197.8 102.2L200.8 102.4L204.8 106.1L206.3 104.6L207.6 105.2L210.5 103.2L213.4 102.6L217.5 108.2L217.2 109.0L219.3 110.6L221.0 110.4L222.0 109.2L223.6 109.6L227.2 107.5L227.6 110.6L225.6 111.7L230.3 115.4L229.2 116.9L229.2 118.5L231.9 120.0L231.5 121.4L235.6 125.1L234.0 130.1L235.2 132.4L236.9 133.9L234.6 135.6L235.9 137.7L234.9 139.5L235.8 140.9L237.7 141.4L240.4 145.4L237.8 145.7L236.2 143.4L233.2 143.4L231.9 142.7L229.2 143.4L226.8 141.3L221.1 143.7L218.2 143.9L216.0 145.4L214.8 151.3L212.6 153.4L215.1 158.1L215.0 159.3L209.9 161.7L210.0 162.2L208.8 160.7L206.3 161.1L202.1 159.7L200.2 158.0L201.3 157.1L201.2 155.2L198.1 153.7L195.8 150.2Z","Punjab":"M164.8 175.4L162.4 178.0L161.5 181.1L158.6 178.6L160.2 176.7L159.1 174.6L157.5 174.8L154.9 174.0L153.4 172.1L151.0 171.1L148.7 171.5L147.5 173.0L131.5 171.6L131.6 169.8L133.2 168.2L132.9 164.7L131.1 162.7L132.9 161.2L132.9 159.8L138.3 155.1L141.5 150.4L146.4 147.1L148.8 146.3L148.4 145.0L144.6 144.9L145.5 139.5L147.6 137.4L144.4 130.9L145.6 130.5L145.9 128.6L147.9 126.7L150.9 125.8L153.2 123.9L158.7 123.4L163.1 120.7L163.1 118.7L162.3 116.9L165.9 117.8L167.7 116.2L169.6 115.9L170.5 114.5L172.8 113.1L174.8 115.8L173.6 115.8L171.4 118.3L168.6 119.1L169.1 121.7L167.7 123.0L174.4 126.1L176.7 133.4L178.9 136.5L180.6 141.0L182.5 140.9L184.7 138.4L186.9 141.7L188.8 141.6L190.1 143.1L189.6 148.0L194.3 151.8L194.2 153.6L191.4 153.4L192.1 155.0L193.9 155.3L196.0 156.9L195.7 161.2L192.2 161.1L191.5 163.5L188.3 165.4L190.0 167.5L188.6 168.6L186.3 168.7L185.0 167.6L181.7 168.9L180.0 172.7L180.9 174.6L178.4 175.3L177.4 176.8L175.2 177.2L171.6 175.1L167.4 177.0L164.8 175.4Z","Uttarakhand":"M230.3 179.3L229.8 177.3L226.1 175.6L223.3 177.0L219.4 180.6L217.4 177.6L215.1 178.5L212.9 173.6L214.7 168.8L215.9 168.3L218.1 165.4L213.0 163.4L211.6 161.7L209.9 161.7L215.0 159.3L215.1 158.1L212.6 153.4L214.8 151.3L216.0 145.4L218.2 143.9L224.2 142.6L225.5 141.4L226.8 141.3L229.2 143.4L231.9 142.7L233.2 143.4L236.2 143.4L237.8 145.7L240.4 145.4L237.7 141.4L241.8 137.4L243.2 138.0L243.8 139.6L245.2 140.3L245.0 141.9L246.5 142.9L247.0 144.8L251.0 147.2L253.0 149.5L255.8 148.4L258.6 148.6L259.2 149.8L262.7 151.5L263.7 152.8L265.2 152.4L266.9 153.8L266.1 157.5L270.4 158.9L273.1 160.7L274.5 160.1L278.7 163.5L282.8 164.8L283.8 166.1L281.3 167.0L275.9 172.0L274.4 172.0L273.3 174.4L270.8 175.5L269.3 177.0L270.2 180.3L266.7 183.8L268.3 187.1L267.1 189.7L264.6 191.6L262.2 199.8L260.6 200.4L257.7 196.6L252.7 197.5L249.2 196.4L248.9 195.1L245.7 194.2L243.3 192.4L243.5 191.3L241.0 190.1L238.7 191.3L237.6 189.3L235.1 187.9L238.6 183.9L236.0 183.3L232.1 181.1L230.3 179.3Z","Chandigarh":"M192.1 155.0L191.4 153.4L194.2 153.6L193.9 155.3L192.1 155.0Z"},"districts":{"Mizoram":["Aizawl","Champhai","Hnahthial","Khawzawl","Kolasib","Lawngtlai","Lunglei","Mamit","Saiha","Serchhip"],"Tamil Nadu":["Ariyalur","Chengalpattu","Chennai","Coimbatore","Cuddalore","Dharmapuri","Dindigul","Erode","Kallakurichi","Kancheepuram","Kanyakumari","Karur","Krishnagiri","Madurai","Nagapattinam","Namakkal","Nilgiris","Perambalur","Pudukkottai","Ramanathapuram","Ranipet","Salem","Sivaganga","Tenkasi","Thanjavur","Theni","Thiruvallur","Thiruvarur","Thoothukkudi","Tiruchirappalli","Tirunelveli","Tirupathur","Tiruppur","Tiruvannamalai","Vellore","Viluppuram","Virudhunagar"],"Madhya Pradesh":["Agar Malwa","Alirajpur","Anuppur","Ashoknagar","Balaghat","Barwani","Betul","Bhind","Bhopal","Burhanpur","Chhatarpur","Chhindwara","Damoh","Datia","Dewas","Dhar","Dindori","Guna","Gwalior","Harda","Hoshangabad","Indore","Jabalpur","Jhabua","Katni","Khandwa","Khargone","Mandla","Mandsaur","Morena","Narsinghpur","Neemuch","Niwari","Panna","Raisen","Rajgarh","Ratlam","Rewa","Sagar","Satna","Sehore","Seoni","Shahdol","Shajapur","Sheopur","Shivpuri","Sidhi","Singrauli","Tikamgarh","Ujjain","Umaria","Vidisha"],"Maharashtra":["Ahmednagar","Akola","Amravati","Aurangabad","Beed","Bhandara","Buldhana","Chandrapur","Dhule","Gadchiroli","Gondia","Hingoli","Jalgaon","Jalna","Kolhapur","Latur","Mumbai","Nagpur","Nanded","Nandurbar","Nashik","Osmanabad","Palghar","Parbhani","Pune","Raigad","Ratnagiri","Sangli","Satara","Sindhudurg","Solapur","Thane","Wardha","Washim","Yavatmal"],"Chhattisgarh":["Balod","Baloda Bazar","Balrampur","Bametara","Bastar","Bijapur","Bilaspur","Dakshin Bastar Dantewada","Dhamtari","Durg","Gariaband","Janjgir Champa","Jashpur","Kabeerdham","Kondagaon","Korba","Koriya","Mahasamund","Mungeli","Narayanpur","Raigarh","Raipur","Rajnandgaon","Sukma","Surajpur","Surguja","Uttar Bastar Kanker"],"Gujarat":["Ahmedabad","Amreli","Anand","Aravalli","Banaskantha","Bharuch","Bhavnagar","Botad","Chhota Udaipur","Dahod","Dang","Devbhumi Dwarka","Gandhinagar","Gir Somnath","Jamnagar","Junagadh","Kheda","Kutch","Mahisagar","Mehsana","Morbi","Narmada","Navsari","Panchmahal","Patan","Porbandar","Rajkot","Sabarkantha","Surat","Surendranagar","Tapi","Vadodara","Valsad"],"Odisha":["Angul","Balangir","Balasore","Bargarh","Bhadrak","Boudh","Cuttack","Deogarh","Dhenkanal","Gajapati","Ganjam","Jagatsinghpur","Jajpur","Jharsuguda","Kalahandi","Kandhamal","Kendrapara","Kendujhar","Khordha","Koraput","Malkangiri","Mayurbhanj","Nabarangapur","Nayagarh","Nuapada","Puri","Rayagada","Sambalpur","Subarnapur","Sundargarh"],"Andhra Pradesh":["Anantapur","Chittoor","East Godavari","Guntur","Krishna","Kurnool","Prakasam","S.P.S. Nellore","Srikakulam","Visakhapatnam","Vizianagaram","West Godavari","Y.S.R. Kadapa"],"Karnataka":["Bagalkote","Ballari","Belagavi","Bengaluru Rural","Bengaluru Urban","Bidar","Chamarajanagara","Chikkaballapura","Chikkamagaluru","Chitradurga","Dakshina Kannada","Davanagere","Dharwad","Gadag","Hassan","Haveri","Kalaburagi","Kodagu","Kolar","Koppal","Mandya","Mysuru","Raichur","Ramanagara","Shivamogga","Tumakuru","Udupi","Uttara Kannada","Vijayapura","Yadgir"],"Goa":["North Goa","South Goa"],"Kerala":["Alappuzha","Ernakulam","Idukki","Kannur","Kasaragod","Kollam","Kottayam","Kozhikode","Malappuram","Palakkad","Pathanamthitta","Thiruvananthapuram","Thrissur","Wayanad"],"Telangana":["Adilabad","Bhadradri Kothagudem","Hyderabad","Jagtial","Jangaon","Jayashankar Bhupalapally","Jogulamba Gadwal","Kamareddy","Karimnagar","Khammam","Komaram Bheem","Mahabubabad","Mahabubnagar","Mancherial","Medak","Medchal Malkajgiri","Mulugu","Nagarkurnool","Nalgonda","Narayanpet","Nirmal","Nizamabad","Peddapalli","Rajanna Sircilla","Ranga Reddy","Sangareddy","Siddipet","Suryapet","Vikarabad","Wanaparthy","Warangal Rural","Warangal Urban","Yadadri Bhuvanagiri"],"West Bengal":["Alipurduar","Bankura","Birbhum","Cooch Behar","Dakshin Dinajpur","Darjeeling","Hooghly","Howrah","Jalpaiguri","Jhargram","Kalimpong","Kolkata","Malda","Murshidabad","Nadia","North 24 Parganas","Paschim Bardhaman","Paschim Medinipur","Purba Bardhaman","Purba Medinipur","Purulia","South 24 Parganas","Uttar Dinajpur"],"Dadra and Nagar Haveli and Daman and Diu":["Dadra and Nagar Haveli","Daman","Diu"],"Puducherry":["Karaikal","Mahe","Puducherry","Yanam"],"Lakshadweep":["Lakshadweep"],"Arunachal Pradesh":["Anjaw","Changlang","East Kameng","East Siang","Kamle","Kra Daadi","Kurung Kumey","Lepa Rada","Lohit","Longding","Lower Dibang Valley","Lower Siang","Lower Subansiri","Namsai","Pakke Kessang","Papum Pare","Shi Yomi","Siang","Tawang","Tirap","Upper Dibang Valley","Upper Siang","Upper Subansiri","West Kameng","West Siang"],"Assam":["Baksa","Barpeta","Biswanath","Bongaigaon","Cachar","Charaideo","Chirang","Darrang","Dhemaji","Dhubri","Dibrugarh","Dima Hasao","Goalpara","Golaghat","Hailakandi","Hojai","Jorhat","Kamrup","Kamrup Metropolitan","Karbi Anglong","Karimganj","Kokrajhar","Lakhimpur","Majuli","Morigaon","Nagaon","Nalbari","Sivasagar","Sonitpur","South Salmara Mankachar","Tinsukia","Udalguri","West Karbi Anglong"],"Nagaland":["Dimapur","Kiphire","Kohima","Longleng","Mokokchung","Mon","Peren","Phek","Tuensang","Wokha","Zunheboto"],"Meghalaya":["East Garo Hills","East Jaintia Hills","East Khasi Hills","North Garo Hills","Ribhoi","South Garo Hills","South West Garo Hills","South West Khasi Hills","West Garo Hills","West Jaintia Hills","West Khasi Hills"],"Manipur":["Bishnupur","Chandel","Churachandpur","Imphal East","Imphal West","Jiribam","Kakching","Kamjong","Kangpokpi","Noney","Pherzawl","Senapati","Tamenglong","Tengnoupal","Thoubal","Ukhrul"],"Tripura":["Dhalai","Gomati","Khowai","North Tripura","Sipahijala","South Tripura","Unokoti","West Tripura"],"Andaman and Nicobar Islands":["Nicobars","North and Middle Andaman","South Andaman"],"Uttar Pradesh":["Agra","Aligarh","Ambedkar Nagar","Amethi","Amroha","Auraiya","Ayodhya","Azamgarh","Baghpat","Bahraich","Ballia","Balrampur","Banda","Barabanki","Bareilly","Basti","Bhadohi","Bijnor","Budaun","Bulandshahr","Chandauli","Chitrakoot","Deoria","Etah","Etawah","Farrukhabad","Fatehpur","Firozabad","Gautam Buddha Nagar","Ghaziabad","Ghazipur","Gonda","Gorakhpur","Hamirpur","Hapur","Hardoi","Hathras","Jalaun","Jaunpur","Jhansi","Kannauj","Kanpur Dehat","Kanpur Nagar","Kasganj","Kaushambi","Kushinagar","Lakhimpur Kheri","Lalitpur","Lucknow","Maharajganj","Mahoba","Mainpuri","Mathura","Mau","Meerut","Mirzapur","Moradabad","Muzaffarnagar","Pilibhit","Pratapgarh","Prayagraj","Rae Bareli","Rampur","Saharanpur","Sambhal","Sant Kabir Nagar","Shahjahanpur","Shamli","Shrawasti","Siddharthnagar","Sitapur","Sonbhadra","Sultanpur","Unnao","Varanasi"],"Rajasthan":["Ajmer","Alwar","Banswara","Baran","Barmer","Bharatpur","Bhilwara","Bikaner","Bundi","Chittorgarh","Churu","Dausa","Dholpur","Dungarpur","Ganganagar","Hanumangarh","Jaipur","Jaisalmer","Jalore","Jhalawar","Jhunjhunu","Jodhpur","Karauli","Kota","Nagaur","Pali","Pratapgarh","Rajsamand","Sawai Madhopur","Sikar","Sirohi","Tonk","Udaipur"],"Delhi":["Delhi"],"Haryana":["Ambala","Bhiwani","Charkhi Dadri","Faridabad","Fatehabad","Gurugram","Hisar","Jhajjar","Jind","Kaithal","Karnal","Kurukshetra","Mahendragarh","Nuh","Palwal","Panchkula","Panipat","Rewari","Rohtak","Sirsa","Sonipat","Yamunanagar"],"Sikkim":["East Sikkim","North Sikkim","South Sikkim","West Sikkim"],"Bihar":["Araria","Arwal","Aurangabad","Banka","Begusarai","Bhagalpur","Bhojpur","Buxar","Darbhanga","East Champaran","Gaya","Gopalganj","Jamui","Jehanabad","Kaimur","Katihar","Khagaria","Kishanganj","Lakhisarai","Madhepura","Madhubani","Munger","Muzaffarpur","Nalanda","Nawada","Patna","Purnia","Rohtas","Saharsa","Samastipur","Saran","Sheikhpura","Sheohar","Sitamarhi","Siwan","Supaul","Vaishali","West Champaran"],"Jharkhand":["Bokaro","Chatra","Deoghar","Dhanbad","Dumka","East Singhbhum","Garhwa","Giridih","Godda","Gumla","Hazaribagh","Jamtara","Khunti","Koderma","Latehar","Lohardaga","Pakur","Palamu","Ramgarh","Ranchi","Sahibganj","Saraikela-Kharsawan","Simdega","West Singhbhum"],"Ladakh":["Kargil","Leh"],"Jammu and Kashmir":["Anantnag","Bandipora","Baramulla","Budgam","Doda","Ganderbal","Jammu","Kathua","Kishtwar","Kulgam","Kupwara","Mirpur","Muzaffarabad","Pulwama","Punch","Rajouri","Ramban","Reasi","Samba","Shopiyan","Srinagar","Udhampur"],"Himachal Pradesh":["Bilaspur","Chamba","Hamirpur","Kangra","Kinnaur","Kullu","Lahaul and Spiti","Mandi","Shimla","Sirmaur","Solan","Una"],"Punjab":["Amritsar","Barnala","Bathinda","Faridkot","Fatehgarh Sahib","Fazilka","Ferozepur","Gurdaspur","Hoshiarpur","Jalandhar","Kapurthala","Ludhiana","Mansa","Moga","Pathankot","Patiala","Rupnagar","S.A.S. Nagar","Sangrur","Shahid Bhagat Singh Nagar","Sri Muktsar Sahib","Tarn Taran"],"Uttarakhand":["Almora","Bageshwar","Chamoli","Champawat","Dehradun","Haridwar","Nainital","Pauri Garhwal","Pithoragarh","Rudraprayag","Tehri Garhwal","Udham Singh Nagar","Uttarkashi"],"Chandigarh":["Chandigarh"]},"states":["Andaman and Nicobar Islands","Andhra Pradesh","Arunachal Pradesh","Assam","Bihar","Chandigarh","Chhattisgarh","Dadra and Nagar Haveli and Daman and Diu","Delhi","Goa","Gujarat","Haryana","Himachal Pradesh","Jammu and Kashmir","Jharkhand","Karnataka","Kerala","Ladakh","Lakshadweep","Madhya Pradesh","Maharashtra","Manipur","Meghalaya","Mizoram","Nagaland","Odisha","Puducherry","Punjab","Rajasthan","Sikkim","Tamil Nadu","Telangana","Tripura","Uttar Pradesh","Uttarakhand","West Bengal"]};
+
+/* ===== model ===== */
+const VC_KEYS=["Procurement of Raw Materials","Production/Manufacturing","Inventory Management & QA","Marketing & Sales","Transportation & Logistics","Finance","Distribution"];
+const VALUE_CHAIN={
+  "Procurement of Raw Materials":["Agri-Commodity Sourcing","Packaging Material Procurement","Vendor & Supplier Management","Inbound Quality Inspection","Import & Customs"],
+  "Production/Manufacturing":["Processing & Blending","Packaging & Filling Line","Machine Operations","Plant Maintenance","Process & Production Engineering"],
+  "Inventory Management & QA":["Warehouse Operations","Quality Assurance & Testing","Stock & Inventory Control","Cold Chain Management"],
+  "Marketing & Sales":["Trade Marketing","Brand Activation & Promotions","Field Sales","Merchandising","Digital & Performance Marketing"],
+  "Transportation & Logistics":["Fleet Operations","Last-Mile Delivery","Route & Network Planning","Freight & Dispatch","Loading & Unloading"],
+  "Finance":["Accounts & Bookkeeping","Accounts Payable & Receivable","Financial Planning & Analysis","Audit & Compliance","Payroll & Taxation"],
+  "Distribution":["Distributor Management","Channel Sales","Retail Outlet Operations","Order Management & Billing","Secondary Logistics"]
+};
+const VC_SHORT={"Procurement of Raw Materials":"Procurement","Production/Manufacturing":"Production","Inventory Management & QA":"Inventory & QA","Marketing & Sales":"Mktg & Sales","Transportation & Logistics":"Logistics","Finance":"Finance","Distribution":"Distribution"};
+const VC_COLOR={"Procurement of Raw Materials":"#2E2E38","Production/Manufacturing":"#caa500","Inventory Management & QA":"#2DA89C","Marketing & Sales":"#5B6770","Transportation & Logistics":"#3D6B8A","Finance":"#9C7A1E","Distribution":"#7A7A88"};
+const STATES=INDIA.states;
+const PRI_LABEL={H:"High",M:"Medium",L:"Low",_:"Unspecified"};
+const PRI_COLOR={H:"#d64545",M:"#caa500",L:"#2DA89C",_:"#9a9aa6"};
+const ORIGIN={captive:"Captive (In-house)",vendor:"Extended Ecosystem (Vendor)",_:"Unspecified"};
+const ORIGIN_COLOR={captive:"#2E2E38",vendor:"#2DA89C",_:"#9a9aa6"};
+const METRIC_LABEL={current:"Open positions now",m6:"Demand +6 months",m12:"Demand +12 months"};
+
+/* ===== storage ===== */
+const PREFIX="demand_sub:";const mem={};
+const hasWS=(typeof window!=="undefined"&&typeof window.storage!=="undefined");
+let lsOK=false; if(!hasWS){try{const t="__t";localStorage.setItem(t,"1");localStorage.removeItem(t);lsOK=true;}catch(e){lsOK=false;}}
+async function storeSet(id,o){const v=JSON.stringify(o);if(hasWS){try{await window.storage.set(PREFIX+id,v,true);return;}catch(e){}}if(lsOK){try{localStorage.setItem(PREFIX+id,v);return;}catch(e){}}mem[id]=o;}
+async function storeDelete(id){if(hasWS){try{await window.storage.delete(PREFIX+id,true);return;}catch(e){}}if(lsOK){try{localStorage.removeItem(PREFIX+id);return;}catch(e){}}delete mem[id];}
+async function storeAll(){const out=[];
+  if(hasWS){try{const r=await window.storage.list(PREFIX,true);const ks=(r&&r.keys)?r.keys:[];for(const k of ks){try{const g=await window.storage.get(k,true);if(g&&g.value)out.push(JSON.parse(g.value));}catch(e){}}return out.sort((a,b)=>b.ts-a.ts);}catch(e){}}
+  if(lsOK){try{for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i);if(k&&k.startsWith(PREFIX)){try{out.push(JSON.parse(localStorage.getItem(k)));}catch(e){}}}return out.sort((a,b)=>b.ts-a.ts);}catch(e){}}
+  return Object.values(mem).sort((a,b)=>b.ts-a.ts);}
+
+/* ===== helpers ===== */
+const $=s=>document.querySelector(s),$$=s=>document.querySelectorAll(s);
+const esc=s=>(s||"").toString().replace(/[&<>]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;"}[c]));
+const escA=s=>(s||"").toString().replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const fmt=n=>(+n||0).toLocaleString("en-IN");
+let selectedVC=null,metric="m12",DATA=[],STATEAGG={},mapMounted=false;
+let logSort={key:"date",dir:-1}, heatSort={key:"Total",dir:-1};
+let AMETRIC="m12",VIEWROWS=[],FILT={vc:"",state:"",sub:"",pri:"",origin:""};
+
+/* ===== init ===== */
+(function init(){
+  $("#f_date").value=new Date().toISOString().slice(0,10);
+  const vp=$("#vcPick");
+  VC_KEYS.forEach((vc,i)=>{const b=document.createElement("button");b.type="button";b.className="vc-btn";b.dataset.vc=vc;
+    b.innerHTML=`<span class="num">${i+1}</span><span class="nm">${esc(vc)}</span><span class="ct">${VALUE_CHAIN[vc].length} sub-sectors</span>`;
+    b.onclick=()=>selectVC(vc);vp.appendChild(b);});
+  $("#storageMode").textContent=hasWS?"Shared dataset · synced in Claude":lsOK?"Saved locally in this browser":"In-memory (this session only)";
+  $$(".tab").forEach(t=>t.onclick=()=>switchTab(t.dataset.tab));
+  $("#btnAddLine").onclick=addLine;$("#btnSubmit").onclick=submit;$("#btnReset").onclick=resetForm;
+  $("#btnCsv").onclick=exportCSV;$("#btnJson").onclick=exportJSON;$("#btnXlsx").onclick=exportXLSX;
+  $("#metricToggle").addEventListener("click",e=>{const b=e.target.closest("button");if(!b)return;metric=b.dataset.m;$$("#metricToggle button").forEach(x=>x.classList.toggle("on",x===b));renderAll();});
+  $("#fl_vc").onchange=e=>{FILT.vc=e.target.value;renderAll();};
+  $("#fl_origin").onchange=e=>{FILT.origin=e.target.value;renderAll();};
+  $("#fl_state").onchange=e=>{FILT.state=e.target.value;renderAll();};
+  $("#fl_sub").onchange=e=>{FILT.sub=e.target.value;renderAll();};
+  $("#fl_pri").onchange=e=>{FILT.pri=e.target.value;renderAll();};
+  $("#btnClearF").onclick=()=>{FILT={vc:"",state:"",sub:"",pri:"",origin:""};populateFilters();renderAll();};
+  $("#btnSeed").onclick=()=>seedSample(30);$("#btnSeedEmpty").onclick=()=>seedSample(30);$("#btnClear").onclick=clearAll;
+  $("#lineBody").addEventListener("change",e=>{
+    if(e.target.classList.contains("d-ss")&&e.target.value==="__other"){const c=e.target.closest("td");
+      c.innerHTML=`<div class="ssother"><input class="d-ss-custom" placeholder="Type sub-sector"><button type="button" class="revert" title="Back to list">&#8634;</button></div>`;c.querySelector(".d-ss-custom").focus();}
+    if(e.target.classList.contains("d-state")){const tr=e.target.closest("tr");const cell=tr.querySelector(".dist-cell");const st=e.target.value;
+      cell.innerHTML = st?`<select class="d-dist">${distOptions(st)}</select>`:`<select class="d-dist" disabled><option>Select state first…</option></select>`;}
+    if(e.target.classList.contains("d-dist")&&e.target.value==="__other"){const c=e.target.closest("td");
+      c.innerHTML=`<div class="ssother"><input class="d-dist-custom" placeholder="Type district / city"><button type="button" class="revert-d" title="Back to list">&#8634;</button></div>`;c.querySelector(".d-dist-custom").focus();}
+  });
+  $("#lineBody").addEventListener("click",e=>{
+    if(e.target.classList.contains("rm")){e.target.closest("tr").remove();if(!$$("#lineBody tr").length)addLine();}
+    if(e.target.classList.contains("revert")){e.target.closest("td").innerHTML=`<select class="d-ss">${ssOptions()}</select>`;}
+    if(e.target.classList.contains("revert-d")){const tr=e.target.closest("tr");const st=tr.querySelector(".d-state")?tr.querySelector(".d-state").value:"";
+      e.target.closest("td").innerHTML = st?`<select class="d-dist">${distOptions(st)}</select>`:`<select class="d-dist" disabled><option>Select state first…</option></select>`;}
+  });
+  refreshCount();
+})();
+function switchTab(t){$$(".tab").forEach(x=>x.classList.toggle("active",x.dataset.tab===t));
+  $("#view-form").classList.toggle("show",t==="form");$("#view-dash").classList.toggle("show",t==="dash");if(t==="dash")loadDash();}
+
+/* ===== form ===== */
+function ssOptions(){const s=VALUE_CHAIN[selectedVC]||[];return `<option value="">Select sub-sector…</option>`+s.map(x=>`<option value="${escA(x)}">${esc(x)}</option>`).join("")+`<option value="__other">Other…</option>`;}
+function stateOptions(){return `<option value="">Select state…</option>`+STATES.map(x=>`<option value="${escA(x)}">${esc(x)}</option>`).join("");}
+function distOptions(st){const d=INDIA.districts[st]||[];return `<option value="">Select district…</option>`+d.map(x=>`<option value="${escA(x)}">${esc(x)}</option>`).join("")+`<option value="__other">Other…</option>`;}
+function priOptions(){return `<option value="">—</option><option value="H">High</option><option value="M" selected>Medium</option><option value="L">Low</option>`;}
+function selectVC(vc){selectedVC=vc;$$(".vc-btn").forEach(b=>b.classList.toggle("sel",b.dataset.vc===vc));
+  $("#lineBody").innerHTML="";addLine();$("#demandWrap").style.display="block";$("#demandEmpty").style.display="none";
+  $("#demandHint").textContent="Sub-sectors: "+VALUE_CHAIN[vc].join(" · ");$("#btnSubmit").disabled=false;}
+function addLine(){if(!selectedVC)return;const tr=document.createElement("tr");
+  tr.innerHTML=`<td><select class="d-ss">${ssOptions()}</select></td>
+    <td><select class="d-state">${stateOptions()}</select></td>
+    <td class="dist-cell"><select class="d-dist" disabled><option>Select state first…</option></select></td>
+    <td><input type="number" min="0" class="d-cur" placeholder="0"></td>
+    <td><input type="number" min="0" class="d-m6" placeholder="0"></td>
+    <td><input type="number" min="0" class="d-m12" placeholder="0"></td>
+    <td><select class="d-pri">${priOptions()}</select></td>
+    <td><button class="rm" title="Remove line">&times;</button></td>`;
+  $("#lineBody").appendChild(tr);}
+function readLines(){const out=[];$$("#lineBody tr").forEach(tr=>{
+    let ss="";const cu=tr.querySelector(".d-ss-custom");if(cu)ss=cu.value.trim();else{const s=tr.querySelector(".d-ss");ss=(s&&s.value!=="__other")?s.value:"";}
+    const state=tr.querySelector(".d-state").value;
+    let dist="";const dc=tr.querySelector(".d-dist-custom");if(dc)dist=dc.value.trim();else{const d=tr.querySelector(".d-dist");dist=(d&&d.value!=="__other")?d.value:"";}
+    const cur=+(tr.querySelector(".d-cur").value||0),m6=+(tr.querySelector(".d-m6").value||0),m12=+(tr.querySelector(".d-m12").value||0);
+    const pri=tr.querySelector(".d-pri").value;
+    if(ss&&state&&(cur||m6||m12))out.push({subSector:ss,state,district:dist,current:cur,m6,m12,priority:pri});});return out;}
+async function submit(){const name=$("#f_name").value.trim(),org=$("#f_org").value.trim(),origin=$("#f_origin").value;
+  if(!selectedVC)return flashHint("Select a value chain function.");
+  if(!name||!org)return flashHint("Fill respondent name and organisation.");
+  if(!origin)return flashHint("Select the demand origin (captive or vendor).");
+  const lines=readLines();if(!lines.length)return flashHint("Add at least one line with a sub-sector, state and a demand figure.");
+  const sub={id:Date.now().toString(36)+Math.random().toString(36).slice(2,6),ts:Date.now(),name,desig:$("#f_desig").value.trim(),org,date:$("#f_date").value,valueChain:selectedVC,source:origin,lines};
+  $("#btnSubmit").disabled=true;await storeSet(sub.id,sub);$("#btnSubmit").disabled=false;
+  toast("Demand submitted · "+lines.length+" line(s) added");resetForm();refreshCount();}
+function resetForm(){["f_name","f_desig","f_org"].forEach(id=>$("#"+id).value="");$("#f_origin").value="";$("#f_date").value=new Date().toISOString().slice(0,10);
+  selectedVC=null;$$(".vc-btn").forEach(b=>b.classList.remove("sel"));$("#lineBody").innerHTML="";
+  $("#demandWrap").style.display="none";$("#demandEmpty").style.display="block";
+  $("#demandHint").textContent="Select a value chain function above to begin";$("#btnSubmit").disabled=true;}
+function flashHint(m){const h=$("#formHint");h.textContent=m;h.style.color="var(--red)";setTimeout(()=>h.textContent="",4000);}
+function toast(m){const t=$("#toast");t.textContent=m;t.classList.add("show");setTimeout(()=>t.classList.remove("show"),2600);}
+async function refreshCount(){$("#countBadge").textContent=(await storeAll()).length;}
+
+/* ===== dashboard ===== */
+async function loadDash(){DATA=await storeAll();$("#countBadge").textContent=DATA.length;
+  if(!DATA.length){$("#dashEmpty").style.display="block";$("#dashBody").style.display="none";return;}
+  $("#dashEmpty").style.display="none";$("#dashBody").style.display="block";populateFilters();renderAll();}
+function flatten(){const r=[];DATA.forEach(s=>s.lines.forEach(l=>r.push(Object.assign({},l,{valueChain:s.valueChain,source:s.source,name:s.name,org:s.org,date:s.date,sid:s.id}))));return r;}
+function aggBy(rows,key){const m={};rows.forEach(r=>{const k=key(r);m[k]=(m[k]||0)+(r[AMETRIC]||0);});return m;}
+function bars(container,entries,colorFn,subFn){const max=Math.max(...entries.map(e=>e[1]),1);
+  container.innerHTML=entries.map(([k,v])=>`<div class="bar-row"><div class="blab" title="${escA(k)}">${esc(k)}${subFn?`<small>${esc(subFn(k))}</small>`:""}</div>
+    <div class="bartrack"><div class="barfill" style="width:${v/max*100}%;background:${colorFn(k)}"></div></div><div class="bval">${fmt(v)}</div></div>`).join("")||`<div class="hint">No data for this metric.</div>`;}
+function agg3(rows,kf){const m={};rows.forEach(r=>{const k=kf(r);(m[k]=m[k]||{c:0,a:0,b:0}),m[k].c+=r.current,m[k].a+=r.m6,m[k].b+=r.m12;});return m;}
+const MET=[{k:"c",l:"Open now",col:"#b3b8c0"},{k:"a",l:"+6m",col:"#FFD400"},{k:"b",l:"+12m",col:"#2E2E38"}];
+function groupedBars(container,entries,subFn){const max=Math.max(1,...entries.flatMap(e=>[e[1].c,e[1].a,e[1].b]));
+  const leg=`<div class="glegend">${MET.map(m=>`<span><i style="background:${m.col}"></i>${m.l}</span>`).join("")}</div>`;
+  container.innerHTML=leg+(entries.map(([k,v])=>`<div class="gbar"><div class="blab" title="${escA(k)}">${esc(k)}${subFn?`<small>${esc(subFn(k))}</small>`:""}</div>
+    <div class="gset">${MET.map(m=>`<div class="grow"><span class="gk">${m.l}</span><div class="gtrack"><div class="gfill" style="width:${v[m.k]/max*100}%;background:${m.col}"></div></div><div class="gv">${fmt(v[m.k])}</div></div>`).join("")}</div></div>`).join("")||`<div class="hint">No data for the current filters.</div>`);}
+function applyFilters(rows){return rows.filter(r=>(!FILT.vc||r.valueChain===FILT.vc)&&(!FILT.state||r.state===FILT.state)&&(!FILT.sub||r.subSector===FILT.sub)&&(!FILT.pri||(r.priority||"_")===FILT.pri)&&(!FILT.origin||(r.source||"_")===FILT.origin));}
+function fillSel(id,values,cur){const el=$(id);el.innerHTML=`<option value="">All</option>`+values.map(v=>`<option value="${escA(v)}">${esc(v)}</option>`).join("");el.value=values.includes(cur)?cur:"";}
+function populateFilters(){const rows=flatten();
+  fillSel("#fl_vc",VC_KEYS.filter(v=>rows.some(r=>r.valueChain===v)),FILT.vc);
+  fillSel("#fl_state",[...new Set(rows.map(r=>r.state))].sort(),FILT.state);
+  fillSel("#fl_sub",[...new Set(rows.map(r=>r.subSector))].sort(),FILT.sub);
+  $("#fl_pri").value=FILT.pri;$("#fl_origin").value=FILT.origin;
+  FILT.vc=$("#fl_vc").value;FILT.state=$("#fl_state").value;FILT.sub=$("#fl_sub").value;FILT.pri=$("#fl_pri").value;FILT.origin=$("#fl_origin").value;}
+function mkey(){return metric==="current"?"c":metric==="m6"?"a":"b";}
+function heatColor(t){const stops=[[0,[255,247,194]],[0.5,[255,212,0]],[1,[156,122,0]]];let i=0;while(i<stops.length-1&&t>stops[i+1][0])i++;
+  const[a,ca]=stops[i],[b,cb]=stops[Math.min(i+1,stops.length-1)];const f=b===a?0:(t-a)/(b-a);
+  const c=ca.map((v,j)=>Math.round(v+(cb[j]-v)*f));return `rgb(${c[0]},${c[1]},${c[2]})`;}
+
+function renderAll(){
+  const allRows=flatten();
+  AMETRIC=metric==="all"?"m12":metric;
+  VIEWROWS=applyFilters(allRows);
+  const rows=VIEWROWS;
+  let cur=0,m6=0,m12=0;rows.forEach(r=>{cur+=r.current;m6+=r.m6;m12+=r.m12;});
+  $("#kSubs").textContent=new Set(rows.map(r=>r.sid)).size;$("#kLines").textContent=rows.length+" demand lines";
+  $("#kCur").textContent=fmt(cur);$("#k6").textContent=fmt(m6);$("#k12").textContent=fmt(m12);
+  let oc=0,ov=0;rows.forEach(r=>{if(r.source==="vendor")ov+=r.m12;else oc+=r.m12;});const otot=oc+ov||1;
+  $("#kOriVal").textContent=Math.round(oc/otot*100)+"% Captive";$("#kOriSub").textContent=Math.round(ov/otot*100)+"% vendor-led ("+fmt(ov)+")";
+  const states=new Set(rows.map(r=>r.state)),subs=new Set(rows.map(r=>r.subSector)),vcs=new Set(rows.map(r=>r.valueChain));
+  $("#chips").innerHTML=[[states.size,"states / UTs covered"],[subs.size,"sub-sectors"],[vcs.size,"value-chain functions"],[rows.length,"demand lines"]].map(([n,l])=>`<span class="chip"><b>${n}</b>${l}</span>`).join("");
+  const ml=metric==="all"?"Open now · +6m · +12m":METRIC_LABEL[metric];
+  $("#mapSub").textContent=metric==="all"?"Shading by +12 months":"Shading by "+ml;
+  $("#heatSub").textContent=metric==="all"?"Showing +12 months":"Showing "+ml;
+  $("#subSub").textContent=ml;$("#stSub").textContent=metric==="all"?"all horizons":ml;
+  const af=[FILT.vc&&("Value chain: "+VC_SHORT[FILT.vc]),FILT.origin&&("Origin: "+ORIGIN[FILT.origin]),FILT.state&&("State: "+FILT.state),FILT.sub&&("Sub-sector: "+FILT.sub),FILT.pri&&("Priority: "+PRI_LABEL[FILT.pri])].filter(Boolean);
+  $("#filtInfo").textContent=af.length?(`Showing ${rows.length} of ${allRows.length} demand lines  ·  `+af.join("  ·  ")):`Showing all ${allRows.length} demand lines`;
+
+  STATEAGG={};rows.forEach(r=>{const s=STATEAGG[r.state]||(STATEAGG[r.state]={c:0,a:0,b:0,lines:0,_t:{}});s.c+=r.current;s.a+=r.m6;s.b+=r.m12;s.lines++;s._t[r.subSector]=(s._t[r.subSector]||0)+r.m12;});
+  for(const k in STATEAGG){const t=STATEAGG[k]._t;let best=null,bv=-1;for(const ss in t)if(t[ss]>bv){bv=t[ss];best=ss;}STATEAGG[k].topSub=best;delete STATEAGG[k]._t;}
+  if(!mapMounted){buildMap();mapMounted=true;}
+  colorMap();
+
+  const ssVC={};rows.forEach(r=>ssVC[r.subSector]=r.valueChain);
+  if(metric==="all"){
+    const sa=agg3(rows,r=>r.subSector),va=agg3(rows,r=>r.valueChain),ta=agg3(rows,r=>r.state);
+    groupedBars($("#subBars"),Object.entries(sa).sort((a,b)=>b[1].b-a[1].b).slice(0,12),k=>VC_SHORT[ssVC[k]]||"");
+    groupedBars($("#vcBars"),VC_KEYS.map(vc=>[vc,va[vc]]).filter(e=>e[1]).sort((a,b)=>b[1].b-a[1].b));
+    groupedBars($("#stateBars"),Object.entries(ta).sort((a,b)=>b[1].b-a[1].b).slice(0,10));
+  }else{
+    const sa=aggBy(rows,r=>r.subSector),va=aggBy(rows,r=>r.valueChain),ta=aggBy(rows,r=>r.state);
+    bars($("#subBars"),Object.entries(sa).sort((a,b)=>b[1]-a[1]).slice(0,12),()=>"linear-gradient(90deg,var(--ey-yellow),#ffd400)",k=>VC_SHORT[ssVC[k]]||"");
+    bars($("#vcBars"),VC_KEYS.map(vc=>[vc,(va[vc]||0)]).filter(e=>e[1]>0).sort((a,b)=>b[1]-a[1]),k=>VC_COLOR[k]||"#888");
+    bars($("#stateBars"),Object.entries(ta).sort((a,b)=>b[1]-a[1]).slice(0,10),()=>"linear-gradient(90deg,#2DA89C,#1f7c73)");
+  }
+
+  const priAgg=aggBy(rows,r=>r.priority||"_");const pOrder=["H","M","L","_"].filter(k=>priAgg[k]);const pTot=pOrder.reduce((a,k)=>a+priAgg[k],0)||1;
+  $("#priSeg").innerHTML=pOrder.map(k=>`<span style="background:${PRI_COLOR[k]};flex:${priAgg[k]}">${Math.round(priAgg[k]/pTot*100)}%</span>`).join("")||`<span style="background:#e9eaee;flex:1;color:#9a9aa6">no data</span>`;
+  $("#priLeg").innerHTML=pOrder.map(k=>`<span><i style="background:${PRI_COLOR[k]}"></i>${PRI_LABEL[k]} · ${fmt(priAgg[k])}</span>`).join("");
+
+  const oriAgg=aggBy(rows,r=>r.source||"_");const oOrder=["captive","vendor","_"].filter(k=>oriAgg[k]);const oTot=oOrder.reduce((a,k)=>a+oriAgg[k],0)||1;
+  $("#oriSeg").innerHTML=oOrder.map(k=>`<span style="background:${ORIGIN_COLOR[k]};flex:${oriAgg[k]}">${Math.round(oriAgg[k]/oTot*100)}%</span>`).join("")||`<span style="background:#e9eaee;flex:1;color:#9a9aa6">no data</span>`;
+  $("#oriLeg").innerHTML=oOrder.map(k=>`<span><i style="background:${ORIGIN_COLOR[k]}"></i>${ORIGIN[k]} · ${fmt(oriAgg[k])}</span>`).join("");
+
+  renderHeat(rows);renderLog();
+}
+
+/* ----- map ----- */
+function buildMap(){
+  const svg=`<svg viewBox="${INDIA.viewBox}" class="indiasvg" preserveAspectRatio="xMidYMid meet">`+
+    STATES.map(st=>INDIA.paths[st]?`<path class="stp" data-st="${escA(st)}" d="${INDIA.paths[st]}"></path>`:"").join("")+`</svg>`;
+  const wrap=$("#mapWrap");wrap.innerHTML=svg+`<div class="maptip" id="mapTip"></div>`;
+  wrap.querySelectorAll(".stp").forEach(p=>{
+    p.addEventListener("mouseenter",()=>showTip(p.dataset.st,p));
+    p.addEventListener("mouseleave",()=>{$("#mapTip").style.opacity=0;p.classList.remove("hot");});});
+  wrap.addEventListener("mousemove",e=>{const t=$("#mapTip");if(t.style.opacity==="0"||!t.style.opacity)return;const r=wrap.getBoundingClientRect();
+    let x=e.clientX-r.left+14,y=e.clientY-r.top+14;if(x+190>r.width)x=e.clientX-r.left-186;if(x<0)x=4;t.style.left=x+"px";t.style.top=y+"px";});
+}
+function showTip(st,p){const a=STATEAGG[st];const t=$("#mapTip");p.classList.add("hot");
+  if(!a)t.innerHTML=`<b>${esc(st)}</b><div class="tno">No demand reported</div>`;
+  else t.innerHTML=`<b>${esc(st)}</b>
+    <div class="trow"><span>Open now</span><b>${fmt(a.c)}</b></div>
+    <div class="trow"><span>+6 months</span><b>${fmt(a.a)}</b></div>
+    <div class="trow"><span>+12 months</span><b>${fmt(a.b)}</b></div>
+    <div class="tsub">${a.lines} demand line(s)${a.topSub?` · top: ${esc(a.topSub)}`:""}</div>`;
+  t.style.opacity=1;}
+function colorMap(){const key=mkey();let max=0;for(const s in STATEAGG)max=Math.max(max,STATEAGG[s][key]);
+  $$("#mapWrap .stp").forEach(p=>{const a=STATEAGG[p.dataset.st];const v=a?a[key]:0;p.style.fill=v?heatColor(max?v/max:0):"#e9eaee";});
+  $("#mapMax").textContent=fmt(max);}
+
+/* ----- heatmap (sortable) ----- */
+function renderHeat(rows){
+  const cell={},stTot={},vcTot={};let grand=0,maxCell=0;
+  const stateList=[...new Set(rows.map(r=>r.state))];
+  rows.forEach(r=>{cell[r.state+"||"+r.valueChain]=(cell[r.state+"||"+r.valueChain]||0)+(r[AMETRIC]||0);});
+  stateList.forEach(st=>{stTot[st]=0;VC_KEYS.forEach(vc=>{const v=cell[st+"||"+vc]||0;stTot[st]+=v;vcTot[vc]=(vcTot[vc]||0)+v;grand+=v;if(v>maxCell)maxCell=v;});});
+  const kv=st=>heatSort.key==="State"?st:heatSort.key==="Total"?stTot[st]:(cell[st+"||"+heatSort.key]||0);
+  stateList.sort((a,b)=>{const va=kv(a),vb=kv(b);if(heatSort.key==="State")return(va<vb?-1:va>vb?1:0)*heatSort.dir;return(va-vb)*heatSort.dir;});
+  const arrow=k=>heatSort.key===k?(heatSort.dir>0?" ▲":" ▼"):"";
+  const col=v=>{if(!v)return "background:transparent;color:#c4c4cc";const a=0.14+0.82*(v/(maxCell||1));return `background:rgba(255,214,0,${a.toFixed(2)});color:${a>0.62?'#5a4f00':'#1b1b21'}`;};
+  let h=`<thead><tr><th class="rowh sortable" data-hk="State">State / UT${arrow("State")}</th>`+
+    VC_KEYS.map(vc=>`<th class="sortable" data-hk="${escA(vc)}" title="${escA(vc)}">${esc(VC_SHORT[vc])}${arrow(vc)}</th>`).join("")+
+    `<th class="sortable" data-hk="Total">Total${arrow("Total")}</th></tr></thead><tbody>`;
+  stateList.forEach(st=>{h+=`<tr><td class="rowh">${esc(st)}</td>`+VC_KEYS.map(vc=>{const v=cell[st+"||"+vc]||0;return `<td style="${col(v)}">${v?fmt(v):'–'}</td>`;}).join("")+`<td class="totcol">${fmt(stTot[st])}</td></tr>`;});
+  h+=`<tr class="totrow"><td class="rowh">Total</td>`+VC_KEYS.map(vc=>`<td>${vcTot[vc]?fmt(vcTot[vc]):'–'}</td>`).join("")+`<td>${fmt(grand)}</td></tr></tbody>`;
+  $("#heat").innerHTML=h;
+  $$("#heat th.sortable").forEach(th=>th.onclick=()=>{const k=th.dataset.hk;if(heatSort.key===k)heatSort.dir*=-1;else{heatSort.key=k;heatSort.dir=k==="State"?1:-1;}renderHeat(flatten());});
+}
+
+/* ----- submission log (sortable, flat) ----- */
+const LOGCOLS=[{k:"name",l:"Respondent",t:"s"},{k:"org",l:"Organisation",t:"s"},{k:"date",l:"Date",t:"s"},
+  {k:"valueChain",l:"Value chain",t:"s"},{k:"source",l:"Origin",t:"s"},{k:"subSector",l:"Sub-sector",t:"s"},
+  {k:"state",l:"State",t:"s"},{k:"district",l:"District",t:"s"},{k:"current",l:"Now",t:"n"},{k:"m6",l:"+6m",t:"n"},{k:"m12",l:"+12m",t:"n"},
+  {k:"priority",l:"Priority",t:"s"}];
+function renderLog(){const rows=VIEWROWS;const sc=LOGCOLS.find(c=>c.k===logSort.key);
+  rows.sort((a,b)=>{let va=a[logSort.key],vb=b[logSort.key];if(sc.t==="n")return((+va||0)-(+vb||0))*logSort.dir;
+    va=(va||"").toString().toLowerCase();vb=(vb||"").toString().toLowerCase();return(va<vb?-1:va>vb?1:0)*logSort.dir;});
+  const arrow=k=>logSort.key===k?(logSort.dir>0?" ▲":" ▼"):"";
+  let th=LOGCOLS.map(c=>`<th class="sortable" data-k="${c.k}">${c.l}${arrow(c.k)}</th>`).join("")+"<th></th>";
+  let body=rows.map(r=>`<tr><td><b>${esc(r.name)}</b></td><td>${esc(r.org)}</td><td>${esc(r.date)}</td>
+     <td>${esc(VC_SHORT[r.valueChain]||r.valueChain)}</td><td>${esc(ORIGIN[r.source]||"—")}</td><td>${esc(r.subSector)}</td><td>${esc(r.state)}</td><td>${esc(r.district)||"—"}</td>
+     <td>${fmt(r.current)}</td><td>${fmt(r.m6)}</td><td>${fmt(r.m12)}</td>
+     <td>${r.priority?`<span class="pill ${r.priority}">${PRI_LABEL[r.priority]}</span>`:"—"}</td>
+     <td><button class="del" data-del="${r.sid}">Delete</button></td></tr>`).join("");
+  $("#subsTable").innerHTML=`<thead><tr>${th}</tr></thead><tbody>${body}</tbody>`;
+  $$("#subsTable th.sortable").forEach(h=>h.onclick=()=>{const k=h.dataset.k;if(logSort.key===k)logSort.dir*=-1;else{logSort.key=k;logSort.dir=1;}renderLog();});
+  $$("#subsTable [data-del]").forEach(b=>b.onclick=async()=>{if(confirm("Delete this entire submission?")){await storeDelete(b.dataset.del);DATA=await storeAll();populateFilters();$("#countBadge").textContent=DATA.length;DATA.length?renderAll():loadDash();}});
+}
+
+/* ===== exports ===== */
+function rawRows(){const out=[];DATA.forEach(s=>s.lines.forEach(l=>out.push({"Submission ID":s.id,"Date":s.date,"Respondent":s.name,"Designation":s.desig,"Organisation":s.org,"Demand Origin":ORIGIN[s.source]||"","Value Chain":s.valueChain,"Sub-Sector":l.subSector,"State":l.state,"District":l.district,"Open Now":l.current,"Demand +6m":l.m6,"Demand +12m":l.m12,"Priority":PRI_LABEL[l.priority]||""})));return out;}
+async function ensureData(){if(!DATA.length)DATA=await storeAll();return DATA.length;}
+async function exportCSV(){if(!await ensureData())return toast("Nothing to export yet");const rows=rawRows();const head=Object.keys(rows[0]);
+  const lines=[head.join(",")].concat(rows.map(r=>head.map(h=>`"${String(r[h]??"").replace(/"/g,'""')}"`).join(",")));dl("FMCG_demand_aggregation.csv",lines.join("\n"),"text/csv");}
+async function exportJSON(){if(!await ensureData())return toast("Nothing to export yet");dl("FMCG_demand_aggregation.json",JSON.stringify(DATA,null,2),"application/json");}
+async function exportXLSX(){if(!await ensureData())return toast("Nothing to export yet");if(typeof XLSX==="undefined")return exportCSV();
+  const rows=flatten();const wb=XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb,XLSX.utils.json_to_sheet(rawRows()),"Raw Demand");
+  let cur=0,m6=0,m12=0;rows.forEach(r=>{cur+=r.current;m6+=r.m6;m12+=r.m12;});
+  XLSX.utils.book_append_sheet(wb,XLSX.utils.aoa_to_sheet([["FMCG Skilled Manpower Demand — Summary"],[],["Submissions",DATA.length],["Demand lines",rows.length],["Open positions now",cur],["Demand +6 months",m6],["Demand +12 months",m12],["States / UTs covered",new Set(rows.map(r=>r.state)).size],["Sub-sectors covered",new Set(rows.map(r=>r.subSector)).size],["Generated",new Date().toLocaleString("en-IN")]]),"Summary");
+  const agg3=kf=>{const m={};rows.forEach(r=>{const k=kf(r);(m[k]=m[k]||{c:0,a:0,b:0}),m[k].c+=r.current,m[k].a+=r.m6,m[k].b+=r.m12;});return m;};
+  const sheet=(title,label,m)=>{const aoa=[[label,"Open Now","+6 months","+12 months"]];Object.entries(m).sort((x,y)=>y[1].b-x[1].b).forEach(([k,v])=>aoa.push([k,v.c,v.a,v.b]));XLSX.utils.book_append_sheet(wb,XLSX.utils.aoa_to_sheet(aoa),title);};
+  sheet("By Value Chain","Value Chain",agg3(r=>r.valueChain));sheet("By Sub-Sector","Sub-Sector",agg3(r=>r.subSector));
+  sheet("By State","State",agg3(r=>r.state));sheet("By State+SubSector","State | Sub-Sector",agg3(r=>r.state+" | "+r.subSector));
+  sheet("By Demand Origin","Demand Origin",agg3(r=>ORIGIN[r.source]||"Unspecified"));
+  const states=[...new Set(rows.map(r=>r.state))];const cell={};rows.forEach(r=>{cell[r.state+"||"+r.valueChain]=(cell[r.state+"||"+r.valueChain]||0)+r.m12;});
+  const piv=[["State / Value Chain (Demand +12m)",...VC_KEYS.map(v=>VC_SHORT[v]),"Total"]];
+  states.forEach(st=>{let tot=0;const row=[st,...VC_KEYS.map(vc=>{const v=cell[st+"||"+vc]||0;tot+=v;return v;}),0];row[row.length-1]=tot;piv.push(row);});
+  piv.push(["Total",...VC_KEYS.map(vc=>states.reduce((a,st)=>a+(cell[st+"||"+vc]||0),0)),rows.reduce((a,r)=>a+r.m12,0)]);
+  XLSX.utils.book_append_sheet(wb,XLSX.utils.aoa_to_sheet(piv),"Pivot State x VC");
+  XLSX.writeFile(wb,"FMCG_demand_aggregation.xlsx");toast("Exported Excel · 8 sheets");}
+function dl(fn,c,t){const b=new Blob([c],{type:t}),u=URL.createObjectURL(b);const a=document.createElement("a");a.href=u;a.download=fn;a.click();URL.revokeObjectURL(u);toast("Downloaded "+fn);}
+
+/* ===== sample data ===== */
+async function seedSample(n){
+  const NAMES=["Ramesh Kumar","Priya Sharma","Anil Gupta","Sneha Reddy","Vikram Singh","Meera Nair","Arjun Mehta","Kavya Iyer","Rohit Verma","Deepa Joshi","Suresh Patel","Neha Kapoor","Imran Khan","Lakshmi Rao","Manish Agarwal","Pooja Desai","Sanjay Bhatt","Ritu Malhotra"];
+  const ORGS=["North Zone Operations","West Distribution Hub","South Manufacturing Cluster","East Logistics Network","Central Procurement Cell","Metro Retail Division","Tier-2 Expansion Unit","National Vendor Desk","Regional Supply Office"];
+  const DESIG=["Regional HR Lead","Plant Manager","Operations Head","Talent Acquisition Lead","Cluster Manager","Vendor Coordinator","Workforce Planner","Zonal Lead"];
+  const STSET=["Maharashtra","Uttar Pradesh","Karnataka","Tamil Nadu","Gujarat","Delhi","West Bengal","Rajasthan","Telangana","Madhya Pradesh","Haryana","Punjab","Bihar","Kerala","Andhra Pradesh","Odisha"];
+  const rnd=a=>a[Math.floor(Math.random()*a.length)],ri=(lo,hi)=>Math.floor(lo+Math.random()*(hi-lo+1));
+  for(let i=0;i<n;i++){
+    const vc=rnd(VC_KEYS),subs=VALUE_CHAIN[vc],source=Math.random()<0.62?"captive":"vendor";
+    const date=new Date(Date.now()-ri(0,40)*86400000).toISOString().slice(0,10);
+    const lines=[],used={};
+    for(let j=0,ln=ri(1,4);j<ln;j++){
+      const ss=rnd(subs),st=rnd(STSET),ds=INDIA.districts[st]||[],dist=ds.length?rnd(ds):"";
+      const key=ss+"|"+st+"|"+dist;if(used[key])continue;used[key]=1;
+      const cur=ri(0,30),m6=cur+ri(5,55),m12=m6+ri(10,95);
+      lines.push({subSector:ss,state:st,district:dist,current:cur,m6,m12,priority:rnd(["H","M","L","M","L","H"])});
+    }
+    if(!lines.length)continue;
+    const sub={id:Date.now().toString(36)+i+Math.random().toString(36).slice(2,6),ts:Date.now()-ri(0,500000),name:rnd(NAMES),desig:rnd(DESIG),org:rnd(ORGS),date,valueChain:vc,source,lines};
+    await storeSet(sub.id,sub);
+  }
+  DATA=await storeAll();$("#countBadge").textContent=DATA.length;populateFilters();
+  $("#dashEmpty").style.display="none";$("#dashBody").style.display="block";renderAll();
+  toast("Loaded "+n+" sample submissions");
+}
+async function clearAll(){if(!confirm("Delete ALL demand data (including sample data)? This cannot be undone."))return;
+  const all=await storeAll();for(const s of all)await storeDelete(s.id);
+  DATA=[];FILT={vc:"",state:"",sub:"",pri:"",origin:""};$("#countBadge").textContent=0;loadDash();toast("All data cleared");}
+</script>
+</body>
+</html>
